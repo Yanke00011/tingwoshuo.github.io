@@ -1,0 +1,32 @@
+{
+  "name": "hear-me-out",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist --force-language zh-cn",
+    "preview": "astro preview",
+    "check": "astro check",
+    "new:post": "tsx scripts/new-post.ts"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.13",
+    "@astrojs/rss": "latest",
+    "@astrojs/sitemap": "^3.6.0",
+    "@tailwindcss/vite": "latest",
+    "astro": "5.18.2",
+    "@lucide/astro": "^1.71.0",
+    "pagefind": "latest",
+    "tailwindcss": "latest"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "tsx": "latest",
+    "typescript": "^5.9.3"
+  }
+}

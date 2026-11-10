@@ -1,0 +1,65 @@
+---
+import { Search, Sun, Moon, Menu, X } from '@lucide/astro';
+import { navigation } from '@/config/navigation';
+import { site } from '@/config/site';
+const current = Astro.url.pathname;
+---
+<a class="skip-link" href="#main">跳到正文</a>
+<header class="site-header">
+  <div class="nav-shell container">
+    <a class="brand" href="/" aria-label={`${site.name}首页`}>
+      <span class="brand-mark" aria-hidden="true">听</span><span class="brand-words"><strong>{site.name}</strong><small>{site.englishName}</small></span>
+    </a>
+    <nav class="desktop-nav" aria-label="主导航">
+      {navigation.map((item) => <a href={item.href} class:list={{ active: item.href === '/' ? current === '/' : current.startsWith(item.href) }}>{item.label}</a>)}
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-button search-trigger" aria-label="搜索" data-search-open><Search size={17}/></button>
+      <button class="icon-button theme-toggle" aria-label="切换主题" data-theme-toggle><Sun class="sun-icon" size={17}/><Moon class="moon-icon" size={17}/></button>
+      <button class="icon-button menu-trigger" aria-label="打开菜单" aria-expanded="false" data-menu-toggle><Menu class="menu-icon" size={19}/><X class="close-icon" size={19}/></button>
+    </div>
+  </div>
+  <nav class="mobile-nav" aria-label="移动导航" data-mobile-nav hidden>{navigation.map((item) => <a href={item.href}>{item.label}</a>)}<button data-search-open class="mobile-search"><Search size={16}/> 搜索文章 <kbd>⌘ K</kbd></button></nav>
+</header>
+<div class="search-overlay" data-search-dialog aria-hidden="true">
+  <div class="search-backdrop" data-search-close></div>
+  <section class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+    <div class="search-top"><h2 id="search-title">搜索文章</h2><button class="icon-button" data-search-close aria-label="关闭搜索"><X size={17}/></button></div>
+    <label class="search-field"><Search size={19}/><input data-search-input type="search" placeholder="试试“SwiftUI”或“日常”" autocomplete="off"/><kbd>ESC</kbd></label>
+    <div class="search-results" data-search-results><p class="search-hint">输入关键词，搜索全部文章。</p></div>
+    <a class="search-all" href="/search">打开完整搜索页面 <span>↗</span></a>
+  </section>
+</div>
+<style>
+.site-header{position:sticky;top:0;z-index:30;padding-top:12px}.nav-shell{height:64px;border:1px solid var(--line);border-radius:19px;background:var(--glass);backdrop-filter:blur(24px) saturate(160%);box-shadow:0 5px 22px rgba(26,34,29,.04);display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 18px}.brand{display:flex;align-items:center;gap:10px}.brand-mark{width:34px;height:34px;border-radius:11px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:17px;font-weight:700}.brand-words{display:grid;line-height:1.1}.brand-words strong{font-size:.96rem;letter-spacing:.02em}.brand-words small{font-size:.52rem;letter-spacing:.16em;color:var(--muted);margin-top:4px}.desktop-nav{display:flex;gap:5px;margin-left:auto;margin-right:22px}.desktop-nav a{padding:8px 13px;border-radius:100px;color:var(--muted);font-size:.85rem;transition:all .2s}.desktop-nav a:hover,.desktop-nav a.active{background:var(--surface-soft);color:var(--text)}.desktop-nav a.active{font-weight:650}.nav-actions{display:flex;gap:7px}.nav-actions .icon-button{width:38px;height:38px;border:0;background:transparent}.nav-actions .icon-button:hover{background:var(--surface-soft)}.menu-trigger{display:none!important}:global(.close-icon){display:none}.menu-trigger[aria-expanded="true"] :global(.menu-icon){display:none}.menu-trigger[aria-expanded="true"] :global(.close-icon){display:block}.sun-icon{display:none}:root[data-theme="light"] .sun-icon{display:block}:root[data-theme="light"] .moon-icon{display:none}.mobile-nav{position:absolute;top:84px;left:18px;right:18px;padding:10px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(24px);border-radius:20px;box-shadow:var(--shadow)}.mobile-nav a,.mobile-search{display:flex;padding:12px 14px;border-radius:12px;font-size:.95rem}.mobile-nav a:hover,.mobile-search:hover{background:var(--surface-soft)}.mobile-search{width:100%;align-items:center;gap:8px;border:0;background:transparent;color:var(--muted);text-align:left}.mobile-search kbd{margin-left:auto}.search-overlay{position:fixed;inset:0;z-index:80;display:none;align-items:flex-start;justify-content:center;padding:15vh 20px 20px}.search-overlay.open{display:flex;animation:fade-in .18s ease both}.search-backdrop{position:absolute;inset:0;background:rgba(18,22,19,.36);backdrop-filter:blur(5px)}.search-panel{position:relative;width:min(600px,100%);background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 28px 90px rgba(0,0,0,.2);padding:22px}.search-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.search-top h2{font-size:1.15rem;margin:0;letter-spacing:-.03em}.search-field{height:54px;border-radius:14px;background:var(--surface-soft);display:flex;gap:11px;align-items:center;padding:0 14px;color:var(--muted)}.search-field input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--text);font:inherit}.search-field kbd,kbd{font-size:.68rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:2px 5px}.search-results{max-height:42vh;overflow:auto}.search-hint{padding:20px 4px;color:var(--muted);font-size:.88rem}.search-result{padding:13px 4px;border-bottom:1px solid var(--line)}.search-result a{font-weight:650}.search-result p{font-size:.82rem;color:var(--muted);margin:4px 0 0}.search-all{display:flex;justify-content:space-between;padding-top:16px;font-size:.84rem;color:var(--accent-strong);font-weight:600}
+@media(max-width:760px){.desktop-nav{display:none}.nav-shell{height:60px}.menu-trigger{display:grid!important}.mobile-nav[hidden]{display:none}.mobile-nav:not([hidden]){display:block}.search-overlay{padding-top:10vh}}
+@media(prefers-reduced-transparency:reduce){.nav-shell,.mobile-nav,.search-panel{backdrop-filter:none;background:var(--surface)}}
+</style>
+<script is:inline>
+(()=>{
+const root=document.documentElement;
+const key='hear-me-out-theme';
+const themeMedia=matchMedia('(prefers-color-scheme: dark)');
+let savedTheme=null;
+try{savedTheme=localStorage.getItem(key)}catch{}
+if(savedTheme==='light'||savedTheme==='dark')root.dataset.theme=savedTheme;
+else root.dataset.theme=themeMedia.matches?'dark':'light';
+themeMedia.addEventListener('change',event=>{try{if(!localStorage.getItem(key))root.dataset.theme=event.matches?'dark':'light'}catch{root.dataset.theme=event.matches?'dark':'light'}});
+const dlg=document.querySelector('[data-search-dialog]'),input=document.querySelector('[data-search-input]'),results=document.querySelector('[data-search-results]');
+let lastFocus;
+function closeSearch(){dlg?.classList.remove('open');dlg?.setAttribute('aria-hidden','true');document.body.style.overflow='';lastFocus?.focus()}
+async function search(q){if(!q.trim()){results.innerHTML='<p class="search-hint">输入关键词，搜索全部文章。</p>';return}try{const pagefind=await import('/pagefind/pagefind.js');const found=await pagefind.search(q);const items=await Promise.all(found.results.slice(0,5).map((r)=>r.data()));results.innerHTML=items.length?items.map((x)=>`<article class="search-result"><a href="${x.url}">${x.meta.title||'未命名文章'}</a><p>${x.excerpt}</p></article>`).join(''):'<p class="search-hint">没有找到相关文章。</p>'}catch{results.innerHTML='<p class="search-hint">搜索索引尚未生成，请先完成正式构建。</p>'}}
+document.querySelectorAll('[data-search-open]').forEach(button=>button.addEventListener('click',()=>{lastFocus=document.activeElement;dlg.classList.add('open');dlg.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';setTimeout(()=>input.focus(),20)}));
+document.querySelectorAll('[data-search-close]').forEach(button=>button.addEventListener('click',closeSearch));
+input.addEventListener('input',()=>search(input.value));
+document.addEventListener('keydown',event=>{
+  if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();document.querySelector('[data-search-open]').click()}
+  if(event.key==='Escape'&&dlg.classList.contains('open'))closeSearch();
+  if(event.key==='Tab'&&dlg.classList.contains('open')){const focusable=[...dlg.querySelectorAll('button,input,a[href]')];const first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}
+});
+document.querySelector('[data-theme-toggle]').addEventListener('click',()=>{const next=root.dataset.theme==='dark'?'light':'dark';root.dataset.theme=next;try{localStorage.setItem(key,next)}catch{}});
+const menu=document.querySelector('[data-menu-toggle]'),nav=document.querySelector('[data-mobile-nav]');
+menu.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));nav.hidden=!open});
+
+})();
+</script>

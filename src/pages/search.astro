@@ -1,0 +1,12 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'; import { Search } from '@lucide/astro';
+---
+<BaseLayout title="搜索" description="搜索听我说中的全部文章。"><section class="container search-page"><span class="eyebrow">FIND A NOTE</span><h1>你想找什么？</h1><p>搜索生活记录与技术手记中的关键词。</p><label class="search-box"><Search size={20}/><input id="pagefind-search" type="search" placeholder="试试“周末”或“TypeScript”"/><kbd>↵</kbd></label><div class="search-status" id="search-status">输入关键词开始搜索</div><div id="pagefind-results" class="pagefind-results"></div></section></BaseLayout>
+<script is:inline>
+(()=>{
+const input=document.querySelector('#pagefind-search'),output=document.querySelector('#pagefind-results'),status=document.querySelector('#search-status');let pagefind;
+input.addEventListener('input',async()=>{const q=input.value.trim();if(!q){output.innerHTML='';status.textContent='输入关键词开始搜索';return}status.textContent='正在查找…';try{pagefind??=await import('/pagefind/pagefind.js');const result=await pagefind.search(q);const data=await Promise.all(result.results.map(r=>r.data()));status.textContent=`找到 ${data.length} 条结果`;output.innerHTML=data.map(item=>`<a class="result-card" href="${item.url}"><span>${item.meta.section||''}</span><h2>${item.meta.title||'文章'}</h2><p>${item.excerpt}</p></a>`).join('')||'<p>没有找到相关文章，试试其他关键词。</p>'}catch{status.textContent='搜索索引尚未生成，请先运行 pnpm build。'}});
+
+})();
+</script>
+<style>.search-page{padding:100px 0;max-width:820px}.search-page h1{font-size:clamp(2.7rem,6vw,4.4rem);letter-spacing:-.065em;margin:15px 0 5px}.search-page>p{color:var(--muted);margin:0 0 30px}.search-box{height:64px;border-radius:18px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;padding:0 18px;color:var(--muted)}.search-box input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:1rem}.search-box kbd{padding:3px 8px}.search-status{color:var(--muted);font-size:.78rem;margin:21px 0 10px}.pagefind-results{display:grid;gap:10px}.result-card{padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}.result-card>span{font-size:.68rem;color:var(--accent-strong)}.result-card h2{font-size:1.1rem;margin:6px 0}.result-card p{margin:0;color:var(--muted);font-size:.83rem;line-height:1.7}.result-card mark{background:var(--accent-wash);color:var(--accent-strong)}</style>

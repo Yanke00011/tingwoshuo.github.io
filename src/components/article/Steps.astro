@@ -1,0 +1,6 @@
+---
+interface Props { title?: string; }
+const { title = '操作步骤' } = Astro.props;
+---
+<section class="steps"><h3>{title}</h3><ol><slot/></ol></section>
+<style>.steps{padding:20px 22px;border:1px solid var(--line);border-radius:16px;background:var(--surface);margin:1.5em 0}.steps h3{margin:0 0 .5em!important;font-size:1rem!important}.steps ol{padding-left:1.3em;margin:0}.steps ::slotted(li){padding:.3em 0}</style>

@@ -1,0 +1,5 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'; import { ArrowLeft, ArrowUpRight } from '@lucide/astro';
+---
+<BaseLayout title="页面没有找到" description="这个页面暂时没有在这里。"><section class="container not-found"><span class="eyebrow">A SMALL DETOUR</span><div class="number">404</div><h1>这页好像走丢了。</h1><p>也许链接已经换了位置，或者它还没有被写下来。</p><div><a class="home-link" href="/"><ArrowLeft size={15}/>回到首页</a><a class="archive-link" href="/archive">看看归档 <ArrowUpRight size={15}/></a></div></section></BaseLayout>
+<style>.not-found{min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 0}.number{font-size:clamp(8rem,24vw,17rem);font-weight:700;line-height:.98;letter-spacing:-.11em;color:var(--accent-wash);margin:22px 0}.not-found h1{font-size:1.6rem;letter-spacing:-.04em;margin:0}.not-found p{color:var(--muted);margin:8px 0 24px}.not-found>div:last-child{display:flex;gap:20px}.home-link,.archive-link{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;color:var(--accent-strong);font-weight:600}</style>
