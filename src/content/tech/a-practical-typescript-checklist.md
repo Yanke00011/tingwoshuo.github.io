@@ -15,7 +15,7 @@ TypeScript 的价值不只是让编辑器少画红线。它更像一份关于数
 
 网络响应、用户输入和本地文件都属于运行时数据。给它们写一个静态类型，并不会自动验证真实数据。先用 `unknown` 接收，再做运行时检查，通常比直接断言类型可靠。
 
-```ts
+```ts title="src/lib/guards.ts"
 type Profile = { name: string; bio?: string };
 
 function isProfile(value: unknown): value is Profile {
@@ -30,7 +30,7 @@ function isProfile(value: unknown): value is Profile {
 
 如果一个值只可能处于几种状态，就把这些状态写清楚，而不是散落多个可能互相矛盾的布尔变量。
 
-```ts
+```ts title="src/lib/result.ts"
 type Result<T> =
   | { ok: true; value: T }
   | { ok: false; error: Error };

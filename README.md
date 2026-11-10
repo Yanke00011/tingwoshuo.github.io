@@ -6,7 +6,7 @@
 
 - Astro 5 + TypeScript strict + Astro Content Collections（Zod Schema）
 - Tailwind CSS 4（Vite 插件）与 CSS Variables Design Tokens
-- Markdown / MDX、Shiki、Lucide Astro
+- Markdown / MDX、Expressive Code（Shiki）、行号插件、Lucide Astro
 - Pagefind 中文静态全文搜索、RSS、Sitemap
 - pnpm；静态输出目录 `dist/`，可部署到 Cloudflare Pages
 

@@ -16,7 +16,7 @@ sample: true
 
 在当前 Astro 项目中，集合配置放在 `src/content.config.ts`。用 Zod 描述 Frontmatter，就能在构建时发现缺少标题或错误日期。
 
-```ts
+```ts title="src/content.config.ts"
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
@@ -38,7 +38,7 @@ const posts = defineCollection({
 
 内容集合不会自动创建页面。动态路由通过 `getStaticPaths()` 为每篇文章生成静态页面：
 
-```ts
+```ts title="src/pages/tech/[slug].astro"
 export async function getStaticPaths() {
   const posts = await getCollection('tech', ({ data }) => !data.draft);
   return posts.map((post) => ({
