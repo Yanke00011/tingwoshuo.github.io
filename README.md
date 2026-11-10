@@ -9,6 +9,7 @@
 - Markdown / MDX、Expressive Code（Shiki）、行号插件、Lucide Astro
 - Pagefind 中文静态全文搜索、RSS、Sitemap
 - pnpm；静态输出目录 `dist/`，可部署到 Cloudflare Pages
+- 本地专用创作台：Tiptap + Markdown/MDX AST 检查 + Express loopback API
 
 当前仓库使用 Astro 5.18.2。推荐使用 Node 22.23.4 或更新的 Node 22 LTS 版本，以满足当前开发工具链的运行要求。
 
@@ -41,7 +42,7 @@ pnpm preview
 
 ## 修改网站信息
 
-`src/config/site.ts` 是网站名称、英文名称、简介、站点 URL、作者占位名称、头像、邮箱、GitHub、版权年份和 SEO 默认值的主要入口。作者/联系方式默认是明确占位内容；正式发布前请换成自己的资料，或将未使用的链接留空。
+`src/config/site.ts` 是网站名称、简介、站点 URL、作者署名、联系方式、科技品牌版权署名和 SEO 默认值的主要入口。当前 URL 保留 `example.com` 占位值；配置正式域名后再构建部署。
 
 `src/config/navigation.ts` 修改导航；`src/config/theme.ts` 修改主题存储键和默认策略；颜色、字体、字号比例、圆角、阴影、阅读宽度等令牌集中在 `src/styles/global.css` 的 `:root` 与深色主题变量。
 
@@ -55,7 +56,7 @@ pnpm preview
 pnpm new:post
 ```
 
-随后按提示选择栏目、标题、简介、标签、日期和稳定 slug。脚本会生成 `draft: true` 的 Markdown 文件。确认内容后将其改成 `draft: false`（或删除该字段，默认为 false）即可发布。手动添加时可复制 `templates/post.md`。
+随后按提示选择栏目、标题、简介、标签、日期和稳定 slug。脚本会生成 `draft: true` 的 Markdown 文件。也可以运行 `pnpm editor` 打开本机「听我说 · 创作台」：先编辑并自动保存到 `.editor-drafts/`，点击“生成文件”后写入内容集合；预览、Git 发布为独立操作。创作台仅监听 `127.0.0.1`，不会进入 Astro 构建。
 
 Frontmatter 示例：
 
@@ -85,7 +86,7 @@ featured: false
 
 首页、列表、文章、归档、关于、搜索和 404 页面分别位于 `src/pages/`。内容集合 Schema 在 `src/content.config.ts`。添加新栏目时，需要创建新集合、扩展 `Section`/查询方法和文章路径，然后补列表页与文章页。请先看当前 `life`/`tech` 的实现，保持草稿过滤规则一致。
 
-关于页中的个人介绍和兴趣全部是示例占位；请在 `src/pages/about.astro` 改写。搜索弹窗支持 `⌘/Ctrl + K`，正式全文搜索依赖构建后生成的 Pagefind 索引。
+关于页的个人介绍与项目说明位于 `src/pages/about.astro`。搜索弹窗支持 `⌘/Ctrl + K`，正式全文搜索依赖构建后生成的 Pagefind 索引。
 
 ## 常见问题
 
@@ -94,6 +95,8 @@ featured: false
 - **Canonical/分享链接域名不对？** 更新 `src/config/site.ts` 的 `url` 后重新构建。
 - **pnpm 找不到？** 运行 `corepack enable` 后再执行 `pnpm install`。
 - **构建时 Zod 日期报错？** 使用有效的 `YYYY-MM-DD` 日期，避免带引号的非标准日期字符串。
+
+创作台支持标题、强调、列表、任务列表、引用/提示块、表格、图片、代码块、链接、语义文字色和对齐。上传图片会压缩为 WebP，并询问 Alt 描述与可选图注；图注以图片下方的斜体段落保存。颜色使用 `[[green|强调文字]]` 等受控语法，背景强调使用 `==文字==`；博客在构建时将其编译为兼容浅色/深色主题的标记。遇到 MDX JSX、原始 HTML、表格以外尚不支持的代码围栏元数据等内容时，编辑器会优先保留源码；生成时仍会检查并拒绝未确认的转换。
 
 ## 设计与内容文档
 

@@ -1,14 +1,15 @@
-/** Central site identity and contact details. Replace example values before launch. */
+/** Central site identity and contact details. */
 export const site = {
   name: '听我说',
   englishName: 'HEAR ME OUT',
   description: '关于生活、技术，以及那些值得记录的瞬间。',
-  url: 'https://example.com', // Replace with your production URL; keep canonical URLs accurate.
+  url: 'https://example.com', // Set this to the production site origin before building for deployment.
   language: 'zh-CN',
-  author: '站点作者', // Example placeholder; customize in README.
-  authorAvatar: '', // Optional path such as /images/avatar.jpg.
+  author: '小张',
+  authorAvatar: '',
   email: '',
   github: '',
-  copyrightStart: 2026,
+  copyrightName: '小张科技',
+  copyrightEnglishName: 'XIAOZHANG TECHNOLOGY',
   seo: { titleTemplate: '%s · 听我说', defaultTitle: '听我说 — Hear Me Out' },
 } as const;

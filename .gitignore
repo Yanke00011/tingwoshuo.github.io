@@ -3,3 +3,7 @@ dist/
 .astro/
 .env*
 .DS_Store
+
+# Private local writing studio drafts and build output
+.editor-drafts/
+.editor-dist/

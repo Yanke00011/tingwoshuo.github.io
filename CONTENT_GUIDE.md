@@ -17,7 +17,7 @@
 
 ## Markdown 能力
 
-Astro Markdown 可直接使用标题、列表、引用、表格、图片和代码围栏；MDX 文章也可导入 `@/components/article/Callout.astro`、`ImageFigure.astro` 与 `Steps.astro` 作为轻量内容组件；Expressive Code 使用 Shiki 在构建期高亮代码，支持代码块标题和行号。可在围栏后加 `title="src/example.ts"` 显示文件名；行号默认显示。使用三级标题及以下会让文章页生成目录。代码块自动附加复制按钮，正文图片可点击放大。外部链接建议使用描述性链接文本。
+Astro Markdown 可直接使用标题、列表、引用、表格、图片和代码围栏；MDX 文章也可导入 `@/components/article/Callout.astro`、`ImageFigure.astro` 与 `Steps.astro` 作为轻量内容组件；Expressive Code 使用 Shiki 在构建期高亮代码，支持代码块标题和行号。可在围栏后加 `title="src/example.ts"` 显示文件名；行号默认显示。使用三级标题及以下会让文章页生成目录。代码块自动附加复制按钮，正文图片可点击放大。外部链接建议使用描述性链接文本。文章文字色由创作台的语义色工具写入 `data-tone` 标记，背景强调使用 `==重点内容==`；颜色会随浅色/深色主题适配。无法安全往返的 MDX 或代码围栏元数据会保留源码模式。
 
 图片放在 `public/images/`，写作 `/images/example.jpg`。为内容图片提供 alt 描述；用 `<figure>`/`<figcaption>` 编写图注。长表格可横向滚动。
 
