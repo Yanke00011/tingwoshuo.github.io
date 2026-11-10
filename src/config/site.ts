@@ -3,7 +3,7 @@ export const site = {
   name: '听我说',
   englishName: 'HEAR ME OUT',
   description: '关于生活、技术，以及那些值得记录的瞬间。',
-  url: 'https://example.com', // Set this to the production site origin before building for deployment.
+  url: 'https://tingwoshuo-github-io.pages.dev/',
   language: 'zh-CN',
   author: '小张',
   authorAvatar: '',
