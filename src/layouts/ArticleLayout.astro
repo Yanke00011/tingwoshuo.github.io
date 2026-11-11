@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import { ArrowLeft, ArrowRight } from '@lucide/astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import CoverMedia from '@/components/common/CoverMedia.astro';
 import RelatedPosts from '@/components/article/RelatedPosts.astro';
 import { dateLabel, getPosts, postPath, readingMinutes, type Post } from '@/lib/posts';
 import { site } from '@/config/site';
@@ -47,7 +48,7 @@ const structured = {
         )}
         {post.data.cover && (
           <figure class="article-cover">
-            <img src={post.data.cover} alt={post.data.coverAlt || ''} fetchpriority="high" />
+            <CoverMedia image={{ src: post.data.cover, alt: post.data.coverAlt || '' }} section={post.collection} priority />
             {post.data.coverAlt && <figcaption>{post.data.coverAlt}</figcaption>}
           </figure>
         )}

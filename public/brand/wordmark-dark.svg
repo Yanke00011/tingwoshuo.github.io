@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 82" fill="none"><g transform="translate(2 9)"><rect width="64" height="64" rx="20" fill="#557566"/><path d="M15 16h20a13 13 0 0 1 0 26H26l-9 7v-8a13 13 0 0 1-2-25Z" stroke="#F7F7F4" stroke-width="3.2" stroke-linejoin="round"/><path d="M24 30v-3m7 8V23m7 11v-6m7 3v-1" stroke="#D8E6DC" stroke-width="3.2" stroke-linecap="round"/></g><text x="82" y="43" fill="#ECEEE9" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif" font-size="25" font-weight="700">听我说</text><text x="83" y="62" fill="#A0A69F" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="9" letter-spacing="2.4">HEAR ME OUT</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="72" viewBox="0 0 280 72"><g transform="translate(4 4)">
+  <rect width="64" height="64" rx="15" fill="#241932"/>
+  <path d="M18 25v7m9-13v19m9-24v28l-6 7" fill="none" stroke="#fff8f3" stroke-width="4.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="47" cy="28.5" r="3.5" fill="#ffae92"/>
+</g><g font-family="PingFang SC, Microsoft YaHei, system-ui, sans-serif"><text x="84" y="35" fill="#fff8f3" font-size="27" font-weight="650">听我说</text><text x="85" y="56" fill="#d0c2dc" font-size="12" letter-spacing="2">HEAR ME OUT</text></g></svg>

@@ -2,6 +2,7 @@
 import { ArrowUpRight, Braces } from '@lucide/astro';
 import type { Post } from '@/lib/posts';
 import { dateLabel, postPath, readingMinutes } from '@/lib/posts';
+import CoverMedia from './CoverMedia.astro';
 import { postPresentation } from '@/lib/post-presentation';
 
 interface Props {
@@ -13,12 +14,13 @@ interface Props {
 const { post, compact = false, showSection = true, treatment } = Astro.props;
 const section = post.collection === 'life' ? '闲聊' : '技术';
 const { variant, image } = postPresentation(post, compact, treatment);
+const thumbnail = Boolean(image) && !compact && !treatment;
 ---
-<article class:list={['post-row', variant, { compact, illustrated: image }]} data-variant={variant}>
+<article class:list={['post-row', variant, { compact, thumbnail }]} data-variant={variant}>
   <a href={postPath(post)} class="post-link">
     {image && (
       <div class="post-media">
-        <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
+        <CoverMedia image={image} section={post.collection} />
       </div>
     )}
     <div class="post-copy">
@@ -68,11 +70,15 @@ const { variant, image } = postPresentation(post, compact, treatment);
   .post-link:hover h3 { color: var(--accent-strong); }
   .post-link:hover .post-arrow { background: var(--accent-wash); }
   .post-media { border-radius: var(--radius-control); overflow: hidden; background: var(--surface-soft); }
-  .post-media img { width: 100%; height: 100%; display: block; object-fit: cover; }
   .cover .post-link, .mixed .post-link { background: var(--surface); border: 1px solid var(--line); }
-  .cover .post-media, .spotlight .post-media { grid-column: 1 / -1; aspect-ratio: 2 / 1; }
+  .spotlight .post-media { grid-column: 1 / -1; }
   .mixed .post-link { grid-template-columns: minmax(0, .7fr) minmax(0, 1fr) auto; align-items: center; }
-  .mixed .post-media { aspect-ratio: 4 / 3; }
+  .thumbnail .post-link {
+    grid-template-columns: minmax(0, 1fr) clamp(4.5rem, 24%, 12rem) auto;
+    align-items: center;
+  }
+  .thumbnail .post-copy { grid-area: 1 / 1; }
+  .thumbnail .post-media { grid-area: 1 / 2; }
   .spotlight .post-link {
     padding: clamp(1.25rem, 4vw, 2.75rem);
     background: radial-gradient(ellipse at bottom right, var(--life-wash), transparent 70%), var(--accent-wash);
@@ -85,17 +91,24 @@ const { variant, image } = postPresentation(post, compact, treatment);
     border: 1px solid var(--line);
     border-inline-start: 3px solid var(--accent);
   }
-  .technical .post-media, .text .post-media { grid-column: 1 / -1; aspect-ratio: 3 / 2; width: min(100%, 11rem); }
+  .text .post-media { grid-column: 1 / -1; width: min(100%, 11rem); }
   .compact .post-link { padding-block: var(--space-12); }
   .compact h3 { font-size: 1rem; }
   @media (width < 48rem) {
-    .mixed .post-link { grid-template-columns: minmax(0, 1fr) auto; }
-    .mixed .post-media { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
+    .mixed:not(.thumbnail) .post-link { grid-template-columns: minmax(0, 1fr) auto; }
+    .mixed:not(.thumbnail) .post-media { grid-column: 1 / -1; }
+  }
+  @media (width < 30rem) {
+    .thumbnail .post-link {
+      grid-template-columns: minmax(0, 1fr) clamp(4.5rem, 25%, 6rem);
+      padding: var(--space-12);
+    }
+    .thumbnail .post-arrow { display: none; }
   }
   @media (prefers-reduced-motion: no-preference) {
     .post-link { transition: background-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease); }
-    .post-media img, .post-arrow { transition: transform 360ms var(--ease), background-color var(--duration) var(--ease); }
-    .post-link:hover img { transform: scale(1.04); }
+    .post-media :global(img), .post-arrow { transition: transform 360ms var(--ease), background-color var(--duration) var(--ease); }
+    .post-link:hover :global(img) { transform: scale(1.04); }
     .post-link:hover .post-arrow { transform: translate(2px, -2px); }
     :is(.cover, .mixed, .technical, .spotlight) .post-link:hover { box-shadow: var(--shadow); }
   }

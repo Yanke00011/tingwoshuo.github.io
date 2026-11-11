@@ -169,3 +169,12 @@
 .prose .expressive-code { border-radius: var(--radius-panel); }
 .post-nav a { padding-inline: var(--space-12); border-radius: var(--radius-control); }
 .post-nav a:hover { background: var(--accent-wash); }
+
+/* Studio's existing Markdown caption convention. */
+.prose p:has(> .image-preview-trigger) + p:has(> em:only-child) {
+  color: var(--muted);
+  font-size: var(--type-small);
+  line-height: 1.5;
+  padding-inline-start: var(--space-8);
+  border-inline-start: 2px solid var(--line-strong);
+}

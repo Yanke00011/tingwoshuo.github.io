@@ -1,0 +1,22 @@
+---
+interface Props {
+  image?: { src: string; alt: string };
+  section: 'life' | 'tech';
+  priority?: boolean;
+}
+const { image, section, priority = false } = Astro.props;
+---
+<div class:list={['cover-frame', section]} data-cover-frame>
+  <span class="cover-placeholder" aria-hidden="true"></span>
+  {image && <img src={image.src} alt={image.alt} loading={priority ? 'eager' : 'lazy'} fetchpriority={priority ? 'high' : undefined} decoding="async" />}
+</div>
+
+<script>
+  for (const frame of document.querySelectorAll<HTMLElement>('[data-cover-frame]')) {
+    const image = frame.querySelector('img');
+    if (!image) continue;
+    const showFallback = () => { frame.dataset.failed = 'true'; };
+    image.addEventListener('error', showFallback, { once: true });
+    if (image.complete && !image.naturalWidth) showFallback();
+  }
+</script>

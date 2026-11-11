@@ -56,6 +56,7 @@
   --page-gutter: clamp(1rem, 4vw, 2rem);
   --content: 74rem;
   --reading: 43rem;
+  --cover-ratio: 16 / 9;
   --radius-control: .5rem;
   --radius-panel: 1rem;
   --radius-feature: 1.5rem;
@@ -216,3 +217,33 @@ kbd { font-size: .75rem; color: var(--muted); border: 1px solid var(--line-stron
   .primary-button:hover { transform: translateY(-1px); }
   .primary-button:active, .icon-button:active { transform: scale(.97); }
 }
+
+/* Both real and fallback artwork reserve the same editorial frame. */
+.cover-frame {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: var(--cover-ratio);
+  overflow: hidden;
+  border-radius: var(--radius-control);
+  background: var(--accent-wash);
+}
+.cover-frame.life { background: var(--life-wash); }
+.cover-placeholder {
+  position: absolute;
+  inset: 0;
+  background:
+    url('/brand/mark.svg') center / clamp(2rem, 17%, 5rem) no-repeat,
+    repeating-linear-gradient(135deg, transparent 0 12px, color-mix(in srgb, var(--accent) 9%, transparent) 12px 13px);
+}
+.cover-frame > img, .cover-frame > .image-preview-trigger, .cover-frame > .image-preview-trigger img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0;
+}
+.cover-frame[data-failed] > :is(img, .image-preview-trigger) { visibility: hidden; }
