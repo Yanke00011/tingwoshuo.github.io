@@ -1,6 +1,6 @@
 ---
 title: 何去何从
-description: ""
+description: 聊聊稳定工作、回国选择与未来方向带来的迷茫。
 pubDate: 2026-11-11
 tags:
   - 闲聊
