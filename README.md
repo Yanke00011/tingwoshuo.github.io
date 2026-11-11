@@ -42,7 +42,7 @@ pnpm preview
 
 ## 修改网站信息
 
-`src/config/site.ts` 是网站名称、简介、站点 URL、作者署名、联系方式、科技品牌版权署名和 SEO 默认值的主要入口。当前 URL 保留 `example.com` 占位值；配置正式域名后再构建部署。
+`src/config/site.ts` 是网站名称、简介、站点 URL、作者署名、联系方式、科技品牌版权署名和 SEO 默认值的主要入口。当前 canonical URL 配置为 `https://tingwoshuo-github-io.pages.dev/`；若以后确认切换到正式自定义域名，须同步更新这里以保证 Canonical、Open Graph、RSS 和 robots.txt 一致。
 
 `src/config/navigation.ts` 修改导航；`src/config/theme.ts` 修改主题存储键和默认策略；颜色、字体、字号比例、圆角、阴影、阅读宽度等令牌集中在 `src/styles/global.css` 的 `:root` 与深色主题变量。
 
