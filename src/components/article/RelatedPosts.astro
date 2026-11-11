@@ -8,5 +8,13 @@ const related = posts.filter((post) => post.id !== current.id || post.collection
   .map((post) => ({ post, score: post.data.tags.filter((tag) => current.data.tags.includes(tag)).length + (post.collection === current.collection ? 1 : 0) }))
   .filter((item) => item.score > 0).sort((a, b) => b.score - a.score).slice(0, 2).map((item) => item.post);
 ---
-{related.length > 0 && <section class="related" data-pagefind-ignore><div class="related-heading"><span class="eyebrow">MORE TO EXPLORE</span><h2>也许你还想读</h2></div><div class="related-grid">{related.map((post) => <PostCard post={post} compact />)}</div></section>}
-<style>.related{max-width:var(--reading);margin:58px auto 0}.related-heading{margin-bottom:15px}.related-heading h2{font-size:1.2rem;margin:5px 0;letter-spacing:-.035em}.related-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.related-grid{grid-template-columns:1fr}}</style>
+{related.length > 0 && (
+  <section class="related" data-pagefind-ignore>
+    <div class="section-heading"><h2>也许你还想读</h2></div>
+    <div class="post-list">{related.map((post) => <PostCard post={post} compact />)}</div>
+  </section>
+)}
+<style>
+  .related { margin-top: var(--space-40); }
+  .section-heading h2 { font-size: var(--type-subsection); }
+</style>

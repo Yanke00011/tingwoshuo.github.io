@@ -3,9 +3,71 @@ import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import '@/styles/global.css';
 import { site } from '@/config/site';
+import { theme } from '@/config/theme';
+
 interface Props { title?: string; description?: string; image?: string; noindex?: boolean; }
 const { title, description = site.description, image = '/og.png', noindex = false } = Astro.props;
 const pageTitle = title ? site.seo.titleTemplate.replace('%s', title) : site.seo.defaultTitle;
 const canonical = new URL(Astro.url.pathname, site.url).toString();
+const shareImage = new URL(image, site.url).toString();
 ---
-<!doctype html><html lang={site.language}><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/><meta name="generator" content={Astro.generator}/><meta name="theme-color" content="#f7f7f4"/><title>{pageTitle}</title><meta name="description" content={description}/><link rel="canonical" href={canonical}/><meta property="og:type" content="website"/><meta property="og:site_name" content={site.name}/><meta property="og:title" content={pageTitle}/><meta property="og:description" content={description}/><meta property="og:url" content={canonical}/><meta property="og:image" content={new URL(image,site.url).toString()}/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content={pageTitle}/><meta name="twitter:description" content={description}/><meta name="twitter:image" content={new URL(image,site.url).toString()}/>{noindex && <meta name="robots" content="noindex,nofollow"/>}<link rel="alternate" type="application/rss+xml" title={`${site.name} RSS`} href="/rss.xml"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><link rel="apple-touch-icon" href="/apple-touch-icon.png"/><script is:inline>try{const t=localStorage.getItem('hear-me-out-theme');document.documentElement.dataset.theme=t==='light'||t==='dark'?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch{}</script></head><body id="top"><Header/><main id="main"><slot/></main><Footer/><script is:inline>if(location.pathname.startsWith('/life/')||location.pathname.startsWith('/tech/')){const bar=document.createElement('div');bar.className='reading-progress';bar.setAttribute('aria-hidden','true');document.body.append(bar);const update=()=>{const max=document.documentElement.scrollHeight-innerHeight;bar.style.width=(max>0?scrollY/max*100:0)+'%'};addEventListener('scroll',update,{passive:true});update();document.querySelectorAll('pre').forEach((pre)=>{const b=document.createElement('button');b.className='code-copy';b.textContent='复制';b.setAttribute('aria-label','复制代码');b.onclick=async()=>{await navigator.clipboard.writeText(pre.querySelector('code')?.innerText||pre.innerText);b.textContent='已复制';setTimeout(()=>b.textContent='复制',1500)};pre.append(b)});document.querySelectorAll('.prose img').forEach((img)=>{img.addEventListener('click',()=>{const box=document.createElement('div');box.className='lightbox';box.innerHTML='<button aria-label="关闭图片">×</button><img alt="">';box.querySelector('img').src=img.src;box.querySelector('img').alt=img.alt;document.body.append(box);box.onclick=(e)=>{if(e.target===box||e.target.tagName==='BUTTON')box.remove()};document.addEventListener('keydown',function esc(e){if(e.key==='Escape'){box.remove();document.removeEventListener('keydown',esc)}})});img.loading='lazy';img.decoding='async'});}</script><style is:global>.lightbox{position:fixed;inset:0;z-index:90;background:rgba(10,12,10,.9);display:grid;place-items:center;padding:30px;cursor:zoom-out}.lightbox img{max-width:min(1100px,94vw);max-height:88vh;object-fit:contain;border-radius:10px}.lightbox button{position:absolute;right:24px;top:18px;color:white;background:transparent;border:0;font-size:2rem;cursor:pointer}</style></body></html>
+<!doctype html>
+<html lang={site.language}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#f7f5fa" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={shareImage} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} RSS`} href="/rss.xml" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script define:vars={{ themeKey: theme.storageKey }}>
+      let saved;
+      try { saved = localStorage.getItem(themeKey); } catch {}
+      const dark = saved === 'dark' || (saved !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      document.querySelector('meta[name="theme-color"]').content = dark ? '#19151f' : '#f7f5fa';
+    </script>
+  </head>
+  <body id="top">
+    <Header />
+    <main id="main" tabindex="-1"><slot /></main>
+    <Footer />
+  </body>
+</html>
+
+
+<script>
+  // Keep the normal document visible even when motion or JavaScript is unavailable.
+  const motion = matchMedia('(prefers-reduced-motion: no-preference)');
+  if (motion.matches && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        if (!motion.matches || entry.target.contains(document.activeElement)) continue;
+        entry.target.animate(
+          [{ opacity: .65, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 420, easing: 'cubic-bezier(.22, 1, .36, 1)' },
+        );
+      }
+    }, { threshold: 0.12 });
+    for (const section of document.querySelectorAll('[data-reveal]')) {
+      if (section.getBoundingClientRect().top >= innerHeight) observer.observe(section);
+    }
+  }
+</script>

@@ -1,14 +1,103 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'; import { Search } from '@lucide/astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { Search } from '@lucide/astro';
 ---
-<BaseLayout title="搜索" description="搜索听我说中的全部文章。"><section class="container search-page"><span class="eyebrow">FIND A NOTE</span><h1>你想找什么？</h1><p>搜索生活记录与技术手记中的关键词。</p><label class="search-box"><Search size={20}/><input id="pagefind-search" type="search" placeholder="试试“周末”或“TypeScript”"/><kbd>↵</kbd></label><div class="search-filters" role="group" aria-label="按栏目筛选"><button type="button" data-category="" aria-pressed="true">全部</button><button type="button" data-category="life" aria-pressed="false">闲聊</button><button type="button" data-category="tech" aria-pressed="false">技术</button></div><div class="search-status" id="search-status">输入关键词开始搜索</div><div id="pagefind-results" class="pagefind-results"></div></section></BaseLayout>
-<script is:inline>
-(()=>{
-const input=document.querySelector('#pagefind-search'),output=document.querySelector('#pagefind-results'),status=document.querySelector('#search-status');let pagefind,lastResults=[],activeCategory='';
-const renderResults=()=>{const filtered=lastResults.filter(item=>!activeCategory||new URL(item.url,location.origin).pathname.startsWith(`/${activeCategory}/`));status.textContent=`找到 ${filtered.length} 条结果`;output.innerHTML=filtered.map(item=>`<a class="result-card" href="${item.url}"><span>${item.meta.section||''}</span><h2>${item.meta.title||'文章'}</h2><p>${item.excerpt}</p></a>`).join('')||'<p>没有找到相关文章，试试其他关键词。</p>'};
-input.addEventListener('input',async()=>{const q=input.value.trim();if(!q){output.innerHTML='';lastResults=[];status.textContent='输入关键词开始搜索';return}status.textContent='正在查找…';try{pagefind??=await import('/pagefind/pagefind.js');const result=await pagefind.search(q);lastResults=await Promise.all(result.results.map(r=>r.data()));renderResults()}catch{status.textContent='搜索索引尚未生成，请先运行 pnpm build。'}});
-document.querySelectorAll('[data-category]').forEach(button=>button.addEventListener('click',()=>{activeCategory=button.dataset.category;document.querySelectorAll('[data-category]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));if(lastResults.length)renderResults()}));
+<BaseLayout title="搜索" description="搜索听我说中的全部文章。">
+  <section class="container search-page">
+    <header class="page-intro">
+      <h1>搜索文章</h1>
+      <p>搜索生活记录与技术手记中的关键词。</p>
+    </header>
+    <label class="search-field">
+      <Search size={18} />
+      <span class="sr-only">搜索关键词</span>
+      <input id="pagefind-search" type="search" placeholder="例如 TypeScript 或周末" />
+    </label>
+    <div class="filter-row" role="group" aria-label="按栏目筛选">
+      <button type="button" data-category="" aria-pressed="true">全部</button>
+      <button type="button" data-category="life" aria-pressed="false">闲聊</button>
+      <button type="button" data-category="tech" aria-pressed="false">技术</button>
+    </div>
+    <p class="search-status" id="search-status" role="status">输入关键词开始搜索。</p>
+    <div id="pagefind-results" class="search-results"></div>
+  </section>
+</BaseLayout>
 
-})();
+<script>
+  import { findArticles } from '@/lib/search-client';
+  import { createHighlighter, renderExcerpt } from '@/lib/search-highlight';
+
+  const input = document.querySelector<HTMLInputElement>('#pagefind-search')!;
+  const status = document.querySelector('#search-status')!;
+  const output = document.querySelector('#pagefind-results')!;
+  let results: Awaited<ReturnType<typeof findArticles>> = [];
+  let category = '';
+  let request = 0;
+  let hasSearched = false;
+
+  function renderResults() {
+    const filtered = results.filter((item) => !category || new URL(item.url, location.origin).pathname.startsWith(`/${category}/`));
+    status.textContent = filtered.length ? `找到 ${filtered.length} 条结果` : '没有找到相关文章，试试其他关键词。';
+    output.replaceChildren();
+    const highlight = createHighlighter(input.value.trim());
+    for (const item of filtered) {
+      const link = document.createElement('a');
+      link.href = item.url;
+      const label = document.createElement('span');
+      label.append(highlight(item.meta.section ?? ''));
+      const title = document.createElement('h2');
+      title.append(highlight(item.meta.title || '未命名文章'));
+      const snippet = document.createElement('p');
+      snippet.append(renderExcerpt(item.excerpt, highlight));
+      link.append(label, title, snippet);
+      output.append(link);
+    }
+  }
+
+  input.addEventListener('input', async () => {
+    const id = ++request;
+    const query = input.value.trim();
+    hasSearched = false;
+    output.replaceChildren();
+    status.textContent = query ? '正在搜索…' : '输入关键词开始搜索。';
+    if (!query) return;
+    try {
+      const matches = await findArticles(query);
+      if (id !== request) return;
+      results = matches;
+      hasSearched = true;
+      renderResults();
+    } catch {
+      if (id === request) status.textContent = '搜索索引暂不可用，请使用构建后的预览。';
+    }
+  });
+  const filters = document.querySelectorAll<HTMLButtonElement>('[data-category]');
+  for (const button of filters) {
+    button.addEventListener('click', () => {
+      category = button.dataset.category ?? '';
+      for (const filter of filters) filter.setAttribute('aria-pressed', String(filter === button));
+      if (hasSearched) renderResults();
+    });
+  }
 </script>
-<style>.search-page{padding:100px 0;max-width:820px}.search-page h1{font-size:clamp(2.7rem,6vw,4.4rem);letter-spacing:-.065em;margin:15px 0 5px}.search-page>p{color:var(--muted);margin:0 0 30px}.search-box{height:64px;border-radius:18px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;padding:0 18px;color:var(--muted)}.search-box input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:1rem}.search-box kbd{padding:3px 8px}.search-filters{display:flex;gap:8px;margin-top:16px}.search-filters button{border:0;border-radius:100px;background:var(--surface-soft);padding:7px 13px;color:var(--muted);font:inherit;font-size:.75rem;cursor:pointer}.search-filters button[aria-pressed="true"]{background:var(--accent);color:#fff}.search-status{color:var(--muted);font-size:.78rem;margin:21px 0 10px}.pagefind-results{display:grid;gap:10px}.result-card{padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}.result-card>span{font-size:.68rem;color:var(--accent-strong)}.result-card h2{font-size:1.1rem;margin:6px 0}.result-card p{margin:0;color:var(--muted);font-size:.83rem;line-height:1.7}.result-card mark{background:var(--accent-wash);color:var(--accent-strong)}</style>
+
+<style>
+  .search-page { max-width: 54rem; }
+  .page-intro { margin-bottom: var(--space-20); }
+  .search-field { min-height: 3.5rem; padding-inline: var(--space-16); }
+  .filter-row { margin-top: var(--space-12); }
+  .search-results { display: grid; gap: var(--space-8); }
+  .search-results :global(a) {
+    display: block;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    padding: var(--space-16) var(--space-20);
+    background: var(--surface);
+    overflow-wrap: anywhere;
+    transition: border-color var(--duration) var(--ease), background-color var(--duration) var(--ease);
+  }
+  .search-results :global(a:hover) { border-color: var(--accent); background: var(--accent-wash); }
+  .search-results :global(h2) { font-size: var(--type-subsection); line-height: var(--leading-heading); margin-top: var(--space-4); }
+  .search-results :global(span) { color: var(--accent-strong); font-size: var(--type-meta); }
+  .search-results :global(p) { margin-top: var(--space-8); color: var(--secondary); font-size: var(--type-small); }
+</style>

@@ -2,5 +2,31 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { ArrowUpRight } from '@lucide/astro';
 ---
-<BaseLayout title="关于我" description="认识小张，以及这个记录生活与技术的个人空间。"><section class="container about-page"><span class="eyebrow">A LITTLE ABOUT ME</span><h1>关于我<span>。</span></h1><div class="about-grid"><article class="about-main"><p class="about-lead">你好，欢迎来到「听我说」。</p><p>我是小张，一个喜欢技术、设计，也喜欢折腾各种新鲜事物的人。</p><p>我对 Apple 生态、macOS 应用开发、Web 技术和人工智能都有浓厚兴趣。比起单纯实现一个功能，我更在意一个产品是否足够精致、直观，以及真正好用。</p><p>目前，我正在探索和开发一些自己的项目。</p><h2>正在做的项目</h2><div class="projects"><section class="project"><span class="eyebrow">MACOS · TIME TOOL</span><h3>小张时钟 <small>PixelTime</small></h3><p>我开发的 macOS 时间工具，尝试将像素风格与现代 Apple 设计语言结合，让简单的时间功能拥有更好的使用体验。</p></section><section class="project"><span class="eyebrow">WEB · PRODUCT EXPLORATION</span><h3>酒局管家 <small>JIUJU</small></h3><p>我探索 Web 应用开发的另一个项目，涉及前后端架构、数据管理与实际场景中的产品设计。</p></section></div><h2>关于这个空间</h2><p>当然，生活不只有代码。我也喜欢研究软硬件、游戏、新技术，以及那些突然冒出来的想法。</p><p>于是有了这个网站——听我说。这里不只有技术教程，也有生活记录、个人观点和一些不那么正式的碎碎念。不追求每篇文章都有多深刻，只希望认真记录自己感兴趣的事情。</p><p class="closing-note">关于生活，关于技术，也关于我眼中的世界。</p></article><aside class="about-aside"><div class="aside-mark"><img src="/brand/mark.svg" alt="听我说品牌标志" width="72" height="72"/><span class="eyebrow">HEAR ME OUT</span><p>生活 · 技术 · 好奇心</p></div></aside></div><a class="text-link about-back" href="/archive">从文章开始认识我 <ArrowUpRight size={16}/></a></section></BaseLayout>
-<style>.about-page{padding-top:80px}.about-page h1{font-size:clamp(3rem,7vw,5rem);line-height:1.1;letter-spacing:-.07em;margin:18px 0 52px}.about-page h1 span{color:var(--accent)}.about-grid{display:grid;grid-template-columns:minmax(0,700px) 240px;gap:70px;justify-content:space-between}.about-main{font-size:1rem;color:var(--muted);line-height:1.95}.about-main p{margin:1.15em 0}.about-lead{font-size:1.42rem;line-height:1.6;color:var(--text);letter-spacing:-.03em}.about-main h2{font-size:1.35rem;color:var(--text);margin:2.8em 0 1em;letter-spacing:-.03em}.projects{display:grid;gap:12px}.project{padding:22px 24px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}.project h3{font-size:1.2rem;color:var(--text);margin:9px 0 3px}.project h3 small{font-size:.78rem;color:var(--muted);font-weight:500;margin-left:5px}.project p{font-size:.91rem;margin:0}.aside-mark{position:sticky;top:112px;display:grid;justify-items:center;gap:14px;padding:32px 18px;border:1px solid var(--line);border-radius:22px;background:var(--surface-soft)}.aside-mark p{margin:0;color:var(--muted);font-size:.82rem}.about-back{margin-top:36px}.closing-note{color:var(--accent-strong);font-weight:600}@media(max-width:760px){.about-page{padding-top:56px}.about-page h1{margin-bottom:34px}.about-grid{grid-template-columns:1fr;gap:25px}.aside-mark{position:static;justify-items:start;grid-template-columns:auto 1fr;align-items:center;padding:20px}.aside-mark img{grid-row:span 2;width:54px;height:54px}.aside-mark p{grid-column:2}}</style>
+<BaseLayout title="关于我" description="认识小张，以及这个记录生活与技术的个人空间。"><section class="container about-page"><header class="page-intro"><h1>关于我</h1></header><div class="about-grid"><article class="about-main"><p class="about-lead">你好，欢迎来到「听我说」。</p><p>我是小张，一个喜欢技术、设计，也喜欢折腾各种新鲜事物的人。</p><p>我对 Apple 生态、macOS 应用开发、Web 技术和人工智能都有浓厚兴趣。比起单纯实现一个功能，我更在意一个产品是否足够精致、直观，以及真正好用。</p><p>目前，我正在探索和开发一些自己的项目。</p><h2>正在做的项目</h2><div class="projects"><section class="project"><h3>小张时钟 <small>PixelTime</small></h3><p>我开发的 macOS 时间工具，尝试将像素风格与现代 Apple 设计语言结合，让简单的时间功能拥有更好的使用体验。</p></section><section class="project"><h3>酒局管家 <small>JIUJU</small></h3><p>我探索 Web 应用开发的另一个项目，涉及前后端架构、数据管理与实际场景中的产品设计。</p></section></div><h2>关于这个空间</h2><p>当然，生活不只有代码。我也喜欢研究软硬件、游戏、新技术，以及那些突然冒出来的想法。</p><p>于是有了这个网站——听我说。这里不只有技术教程，也有生活记录、个人观点和一些不那么正式的碎碎念。不追求每篇文章都有多深刻，只希望认真记录自己感兴趣的事情。</p><p class="closing-note">关于生活，关于技术，也关于我眼中的世界。</p></article><aside class="about-aside" data-reveal><div class="aside-mark"><img src="/brand/mark.svg" alt="听我说品牌标志" width="72" height="72"/><span class="eyebrow">Hear Me Out</span><p>生活 · 技术 · 好奇心</p></div></aside></div><a class="text-link about-back" href="/archive">从文章开始认识我 <ArrowUpRight size={16}/></a></section></BaseLayout>
+
+<style>
+  .about-grid { display: grid; grid-template-columns: minmax(0, var(--reading)) 1fr; gap: var(--space-48); padding-top: var(--space-24); }
+  .about-main { color: var(--secondary); line-height: 1.9; }
+  .about-main p { margin-bottom: var(--space-16); }
+  .about-lead { font-size: var(--type-lead); color: var(--text); }
+  .about-main h2 { font-size: var(--type-section); color: var(--text); margin-block: var(--space-32) var(--space-12); }
+  .project { border-top: 1px solid var(--line); padding-block: var(--space-12); }
+  .project h3 { font-size: var(--type-subsection); color: var(--text); margin-bottom: var(--space-4); }
+  .project small { font-size: var(--type-small); color: var(--muted); font-weight: 500; }
+  .project p { margin: 0; }
+  .aside-mark {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-8);
+    color: var(--ink-text);
+    font-size: var(--type-small);
+    padding: var(--space-24);
+    border-radius: var(--radius-feature);
+    background: radial-gradient(ellipse at top right, #54365f, var(--ink) 80%);
+  }
+  .aside-mark .eyebrow { color: var(--signal); }
+  .project { padding-inline: var(--space-16); background: var(--surface); }
+  .closing-note { color: var(--accent-strong); }
+  .about-back { margin-top: var(--space-16); }
+  @media (max-width: 767px) { .about-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-24); } }
+</style>

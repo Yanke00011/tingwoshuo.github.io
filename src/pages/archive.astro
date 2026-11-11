@@ -5,5 +5,38 @@ const groups=new Map<number,Map<number,typeof posts>>();
 for(const post of posts){const year=post.data.pubDate.getFullYear();const month=post.data.pubDate.getMonth()+1;const months=groups.get(year)||new Map<number,typeof posts>();months.set(month,[...(months.get(month)||[]),post]);groups.set(year,months)}
 const years=[...groups.keys()].sort((a,b)=>b-a);
 ---
-<BaseLayout title="归档" description="听我说的全部文章，按时间慢慢整理。"><section class="container archive-page"><span class="eyebrow">THE ARCHIVE · 时间线</span><h1>写过的，<br/><span>都在这里。</span></h1><p class="archive-deck">不急着总结，只把时间留住。<br/>目前共记录 {posts.length} 篇文章。</p>{years.length?years.map(year=><section class="year-group"><div class="year-label"><strong>{year}</strong><span>{[...(groups.get(year)?.values()||[])].flat().length} 篇</span></div><div class="year-months">{[...(groups.get(year)?.keys()||[])].sort((a,b)=>b-a).map(month=><section class="month-group"><h2>{String(month).padStart(2,'0')}<small>月</small></h2><div class="year-posts">{groups.get(year)?.get(month)?.map(post=><a class="archive-post" href={postPath(post)}><time>{dateLabel(post.data.pubDate,{month:'2-digit',day:'2-digit'})}</time><span class:list={['archive-section',post.collection]}>{post.collection==='life'?'闲聊':'技术'}</span><strong>{post.data.title}</strong><ArrowUpRight size={15}/></a>)}</div></section>)}</div></section>):<div class="empty-state">还没有公开文章。写下第一篇，时间线就会开始。</div>}</section></BaseLayout>
-<style>.archive-page{padding-top:76px}.archive-page h1{font-size:clamp(3.1rem,7vw,5.3rem);line-height:1.1;letter-spacing:-.07em;margin:16px 0}.archive-page h1 span{color:var(--accent)}.archive-deck{color:var(--muted);font-size:1rem;line-height:1.85;margin:0 0 62px}.year-group{display:grid;grid-template-columns:150px 1fr;gap:24px;padding:25px 0;border-top:1px solid var(--line)}.year-label{display:flex;align-items:baseline;gap:10px}.year-label strong{font-size:1.65rem;letter-spacing:-.05em}.year-label span{color:var(--muted);font-size:.74rem}.year-months{display:grid;gap:22px}.month-group{display:grid;grid-template-columns:56px 1fr;gap:14px}.month-group h2{font-size:1.15rem;line-height:1.25;margin:13px 0;color:var(--accent);font-variant-numeric:tabular-nums}.month-group h2 small{font-size:.67rem;margin-left:2px}.year-posts{display:grid}.archive-post{min-height:52px;display:grid;grid-template-columns:70px 58px 1fr 18px;align-items:center;gap:12px;border-bottom:1px solid var(--line);font-size:.88rem}.archive-post time{color:var(--muted);font-variant-numeric:tabular-nums;font-size:.78rem}.archive-post>svg{color:var(--muted);transition:transform .2s}.archive-post:hover>svg{transform:translate(2px,-2px);color:var(--accent)}.archive-post strong{font-weight:550}.archive-section{font-size:.68rem;color:var(--accent-strong)}.empty-state{text-align:center;padding:35px;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}@media(max-width:700px){.archive-page{padding-top:55px}.archive-deck{margin-bottom:40px}.year-group{grid-template-columns:1fr;gap:6px;padding:18px 0}.month-group{grid-template-columns:40px 1fr;gap:7px}.archive-post{grid-template-columns:48px 40px 1fr 16px;gap:6px;font-size:.8rem}.archive-post time{font-size:.7rem}.year-label strong{font-size:1.35rem}}</style>
+<BaseLayout title="归档" description="听我说的全部文章，按时间慢慢整理。"><section class="container archive-page"><header class="page-intro"><h1>文章归档</h1><p>目前共记录 {posts.length} 篇文章。</p></header>{years.length?years.map(year=><section class="year-group"><div class="year-label"><strong>{year}</strong><span>{[...(groups.get(year)?.values()||[])].flat().length} 篇</span></div><div class="year-months">{[...(groups.get(year)?.keys()||[])].sort((a,b)=>b-a).map(month=><section class="month-group"><h2>{String(month).padStart(2,'0')}<small>月</small></h2><div class="year-posts">{groups.get(year)?.get(month)?.map(post=><a class="archive-post" href={postPath(post)}><time datetime={post.data.pubDate.toISOString()}>{dateLabel(post.data.pubDate,{month:'2-digit',day:'2-digit'})}</time><span class:list={['archive-section',post.collection]}>{post.collection==='life'?'闲聊':'技术'}</span><strong>{post.data.title}</strong><ArrowUpRight size={16} aria-hidden="true" /></a>)}</div></section>)}</div></section>):<div class="empty-state">还没有公开文章。写下第一篇，时间线就会开始。</div>}</section></BaseLayout>
+
+<style>
+  .archive-page .page-intro { margin-bottom: var(--space-12); }
+  .year-group { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: var(--space-24); padding-block: var(--space-24); }
+  .year-group + .year-group { border-top: 1px solid var(--line); }
+  .year-label { display: flex; align-items: baseline; gap: var(--space-8); }
+  .year-label strong { color: var(--accent-strong); font-size: clamp(1.75rem, 4vw, 3.25rem); line-height: 1.1; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .year-label span { color: var(--muted); font-size: var(--type-meta); }
+  .year-months { display: grid; gap: var(--space-16); }
+  .month-group { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: var(--space-16); }
+  .month-group h2 { color: var(--accent-strong); font-size: var(--type-small); margin-top: var(--space-12); font-variant-numeric: tabular-nums; }
+  .month-group small { margin-left: var(--space-4); }
+  .archive-post {
+    display: grid;
+    grid-template-columns: 3rem 2rem minmax(0, 1fr) auto;
+    gap: var(--space-8);
+    align-items: baseline;
+    min-height: var(--target);
+    padding-block: var(--space-12);
+    border-bottom: 1px solid var(--line);
+    overflow-wrap: anywhere;
+  }
+  .archive-post strong { font-weight: 500; }
+  .archive-post svg { align-self: center; color: var(--muted); }
+  .archive-post:hover { background: var(--accent-wash); }
+  .archive-post:hover strong { color: var(--accent-strong); }
+  .archive-post time, .archive-section { font-size: var(--type-meta); color: var(--muted); }
+  @media (max-width: 767px) {
+    .year-group { grid-template-columns: minmax(0, 1fr); gap: var(--space-12); }
+  }
+  @media (max-width: 479px) {
+    .month-group { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  }
+</style>

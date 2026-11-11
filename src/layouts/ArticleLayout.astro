@@ -1,0 +1,156 @@
+---
+import { render } from 'astro:content';
+import { ArrowLeft, ArrowRight } from '@lucide/astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import RelatedPosts from '@/components/article/RelatedPosts.astro';
+import { dateLabel, getPosts, postPath, readingMinutes, type Post } from '@/lib/posts';
+import { site } from '@/config/site';
+import '@/styles/article.css';
+
+const { post } = Astro.props as { post: Post };
+const { Content, headings } = await render(post);
+const posts = await getPosts(post.collection);
+const index = posts.findIndex((entry) => entry.id === post.id);
+const previous = posts[index + 1];
+const next = posts[index - 1];
+const isLife = post.collection === 'life';
+const sectionTitle = isLife ? '随便聊聊' : '技术手记';
+const structured = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate || post.data.pubDate).toISOString(),
+  mainEntityOfPage: new URL(postPath(post), site.url).toString(),
+  author: { '@type': 'Person', name: site.author },
+};
+---
+<BaseLayout title={post.data.title} description={post.data.description} image={post.data.cover || '/og.png'}>
+  <script type="application/ld+json" set:html={JSON.stringify(structured).replace(/</g, '\\u003c')} />
+  <div class="container article-page">
+    <a href={`/${post.collection}`} class="text-link article-back"><ArrowLeft size={16} /> {sectionTitle}</a>
+    <article class="article" data-pagefind-body>
+      <span class="sr-only" data-pagefind-meta="section">{isLife ? '闲聊' : '技术'}</span>
+      <header class:list={['article-header', { 'life-header': isLife }]}>
+        <h1>{post.data.title}</h1>
+        <p class="article-deck">{post.data.description}</p>
+        <div class="article-meta">
+          <time datetime={post.data.pubDate.toISOString()}>{dateLabel(post.data.pubDate)}</time>
+          {post.data.updatedDate && <span>更新于 {dateLabel(post.data.updatedDate)}</span>}
+          <span>{readingMinutes(post.body)} 分钟阅读</span>
+        </div>
+        {post.data.tags.length > 0 && (
+          <ul class="article-tags" aria-label="标签">
+            {post.data.tags.map((tag) => <li class="tag">{tag}</li>)}
+          </ul>
+        )}
+        {post.data.cover && (
+          <figure class="article-cover">
+            <img src={post.data.cover} alt={post.data.coverAlt || ''} fetchpriority="high" />
+            {post.data.coverAlt && <figcaption>{post.data.coverAlt}</figcaption>}
+          </figure>
+        )}
+      </header>
+      <div class="article-layout">
+        {headings.length > 2 && (
+          <details class="toc" data-article-toc data-pagefind-ignore>
+            <summary>文章目录</summary>
+            <nav aria-label="文章目录">
+              {headings.map((heading) => (
+                <a href={`#${heading.slug}`} class:list={{ sub: heading.depth > 2 }}>{heading.text}</a>
+              ))}
+            </nav>
+          </details>
+        )}
+        <div class="prose"><Content /></div>
+      </div>
+    </article>
+    <nav class="post-nav" aria-label="文章导航">
+      {previous && <a href={postPath(previous)}><span><ArrowLeft size={16} /> 上一篇</span><strong>{previous.data.title}</strong></a>}
+      {next && <a href={postPath(next)} class="next"><span>下一篇 <ArrowRight size={16} /></span><strong>{next.data.title}</strong></a>}
+    </nav>
+    <RelatedPosts current={post} />
+  </div>
+  <dialog class="article-lightbox" aria-label="图片预览" data-lightbox>
+    <button type="button" class="icon-button lightbox-close" aria-label="关闭图片">×</button>
+    <img alt="" />
+  </dialog>
+</BaseLayout>
+
+<script>
+  const wide = window.matchMedia('(min-width: 64rem)');
+  const toc = document.querySelector<HTMLDetailsElement>('[data-article-toc]');
+  if (toc) {
+    const syncToc = () => { toc.open = wide.matches; };
+    syncToc();
+    wide.addEventListener('change', syncToc);
+  }
+
+  for (const table of document.querySelectorAll<HTMLTableElement>('.prose table')) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'table-scroll';
+    wrapper.tabIndex = 0;
+    wrapper.setAttribute('role', 'region');
+    wrapper.setAttribute('aria-label', table.caption?.textContent?.trim() || '文章表格');
+    table.before(wrapper);
+    wrapper.append(table);
+  }
+
+  for (const block of document.querySelectorAll<HTMLPreElement>('.prose pre')) {
+    if (block.closest('.expressive-code')) continue;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'plain-code';
+    const copy = document.createElement('button');
+    copy.type = 'button';
+    copy.textContent = '复制代码';
+    block.before(wrapper);
+    wrapper.append(copy, block);
+    let reset: number | undefined;
+    copy.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(block.innerText);
+        copy.textContent = '已复制';
+      } catch {
+        copy.textContent = '复制失败';
+      }
+      window.clearTimeout(reset);
+      reset = window.setTimeout(() => { copy.textContent = '复制代码'; }, 1500);
+    });
+  }
+
+  const lightbox = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+  if (lightbox) {
+    const preview = lightbox.querySelector('img')!;
+    const close = () => lightbox.close();
+    lightbox.querySelector('button')?.addEventListener('click', close);
+    lightbox.addEventListener('click', (event) => { if (event.target === lightbox) close(); });
+    for (const img of document.querySelectorAll<HTMLImageElement>('.prose img, .article-cover img')) {
+      if (img.closest('a, button')) continue;
+      const picture = img.closest('picture') ?? img;
+      const trigger = document.createElement('button');
+      trigger.className = 'image-preview-trigger';
+      trigger.type = 'button';
+      trigger.setAttribute('aria-label', img.alt ? `放大图片：${img.alt}` : '放大图片');
+      picture.before(trigger);
+      trigger.append(picture);
+      trigger.addEventListener('click', () => {
+        preview.src = img.currentSrc || img.src;
+        preview.alt = img.alt;
+        lightbox.showModal();
+      });
+    }
+  }
+
+  const progress = document.createElement('div');
+  progress.className = 'reading-progress';
+  progress.setAttribute('aria-hidden', 'true');
+  document.body.append(progress);
+  const update = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.transform = `scaleX(${max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0})`;
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+</script>

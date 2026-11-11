@@ -2,64 +2,217 @@
 import { Search, Sun, Moon, Menu, X } from '@lucide/astro';
 import { navigation } from '@/config/navigation';
 import { site } from '@/config/site';
-const current = Astro.url.pathname;
+import { theme } from '@/config/theme';
+
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => current === href || (href !== '/' && current.startsWith(href + '/'));
 ---
 <a class="skip-link" href="#main">跳到正文</a>
 <header class="site-header">
   <div class="nav-shell container">
     <a class="brand" href="/" aria-label={`${site.name}首页`}>
-      <img class="brand-mark" src="/brand/mark.svg" alt="" width="34" height="34"/><span class="brand-words"><strong>{site.name}</strong><small>{site.englishName}</small></span>
+      <img src="/brand/mark.svg" alt="" width="32" height="32" />
+      <span>{site.name}<small>{site.englishName}</small></span>
     </a>
     <nav class="desktop-nav" aria-label="主导航">
-      {navigation.map((item) => <a href={item.href} class:list={{ active: item.href === '/' ? current === '/' : current.startsWith(item.href) }}>{item.label}</a>)}
+      {navigation.map((item) => (
+        <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
     </nav>
     <div class="nav-actions">
-      <button class="icon-button search-trigger" aria-label="搜索" data-search-open><Search size={17}/></button>
-      <button class="icon-button theme-toggle" aria-label="切换主题" data-theme-toggle><Sun class="sun-icon" size={17}/><Moon class="moon-icon" size={17}/></button>
-      <button class="icon-button menu-trigger" aria-label="打开菜单" aria-expanded="false" data-menu-toggle><Menu class="menu-icon" size={19}/><X class="close-icon" size={19}/></button>
+      <button class="icon-button" aria-label="搜索文章" data-search-open><Search size={18} /></button>
+      <button class="icon-button theme-toggle" aria-label="深色模式" aria-pressed="false" data-theme-toggle>
+        <Sun class="sun-icon" size={18} /><Moon class="moon-icon" size={18} />
+      </button>
+      <button class="icon-button menu-trigger" aria-label="打开菜单" aria-expanded="false" aria-controls="mobile-nav" data-menu-toggle>
+        <Menu class="menu-icon" size={20} /><X class="close-icon" size={20} />
+      </button>
     </div>
   </div>
-  <nav class="mobile-nav" aria-label="移动导航" data-mobile-nav hidden>{navigation.map((item) => <a href={item.href}>{item.label}</a>)}<button data-search-open class="mobile-search"><Search size={16}/> 搜索文章 <kbd>⌘ K</kbd></button></nav>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="移动导航" hidden>
+    <div class="container mobile-links">
+      {navigation.map((item) => (
+        <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </div>
+  </nav>
 </header>
-<div class="search-overlay" data-search-dialog aria-hidden="true">
-  <div class="search-backdrop" data-search-close></div>
-  <section class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
-    <div class="search-top"><h2 id="search-title">搜索文章</h2><button class="icon-button" data-search-close aria-label="关闭搜索"><X size={17}/></button></div>
-    <label class="search-field"><Search size={19}/><input data-search-input type="search" placeholder="试试“SwiftUI”或“日常”" autocomplete="off"/><kbd>ESC</kbd></label>
-    <div class="search-results" data-search-results><p class="search-hint">输入关键词，搜索全部文章。</p></div>
-    <a class="search-all" href="/search">打开完整搜索页面 <span>↗</span></a>
-  </section>
-</div>
-<style>
-.site-header{position:sticky;top:0;z-index:30;padding-top:12px}.nav-shell{height:64px;border:1px solid var(--line);border-radius:19px;background:var(--glass);backdrop-filter:blur(24px) saturate(160%);box-shadow:0 5px 22px rgba(26,34,29,.04);display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 18px}.brand{display:flex;align-items:center;gap:10px}.brand-mark{width:34px;height:34px;display:block}.brand-words{display:grid;line-height:1.1}.brand-words strong{font-size:.96rem;letter-spacing:.02em}.brand-words small{font-size:.52rem;letter-spacing:.16em;color:var(--muted);margin-top:4px}.desktop-nav{display:flex;gap:5px;margin-left:auto;margin-right:22px}.desktop-nav a{padding:8px 13px;border-radius:100px;color:var(--muted);font-size:.85rem;transition:all .2s}.desktop-nav a:hover,.desktop-nav a.active{background:var(--surface-soft);color:var(--text)}.desktop-nav a.active{font-weight:650}.nav-actions{display:flex;gap:7px}.nav-actions .icon-button{width:38px;height:38px;border:0;background:transparent}.nav-actions .icon-button:hover{background:var(--surface-soft)}.menu-trigger{display:none!important}:global(.close-icon){display:none}.menu-trigger[aria-expanded="true"] :global(.menu-icon){display:none}.menu-trigger[aria-expanded="true"] :global(.close-icon){display:block}.sun-icon{display:none}:root[data-theme="light"] .sun-icon{display:block}:root[data-theme="light"] .moon-icon{display:none}.mobile-nav{position:absolute;top:84px;left:18px;right:18px;padding:10px;border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(24px);border-radius:20px;box-shadow:var(--shadow)}.mobile-nav a,.mobile-search{display:flex;padding:12px 14px;border-radius:12px;font-size:.95rem}.mobile-nav a:hover,.mobile-search:hover{background:var(--surface-soft)}.mobile-search{width:100%;align-items:center;gap:8px;border:0;background:transparent;color:var(--muted);text-align:left}.mobile-search kbd{margin-left:auto}.search-overlay{position:fixed;inset:0;z-index:80;display:none;align-items:flex-start;justify-content:center;padding:15vh 20px 20px}.search-overlay.open{display:flex;animation:fade-in .18s ease both}.search-backdrop{position:absolute;inset:0;background:rgba(18,22,19,.36);backdrop-filter:blur(5px)}.search-panel{position:relative;width:min(600px,100%);background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 28px 90px rgba(0,0,0,.2);padding:22px}.search-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.search-top h2{font-size:1.15rem;margin:0;letter-spacing:-.03em}.search-field{height:54px;border-radius:14px;background:var(--surface-soft);display:flex;gap:11px;align-items:center;padding:0 14px;color:var(--muted)}.search-field input{min-width:0;flex:1;border:0;outline:0;background:transparent;color:var(--text);font:inherit}.search-field kbd,kbd{font-size:.68rem;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:2px 5px}.search-results{max-height:42vh;overflow:auto}.search-hint{padding:20px 4px;color:var(--muted);font-size:.88rem}.search-result{padding:13px 4px;border-bottom:1px solid var(--line)}.search-result a{font-weight:650}.search-result p{font-size:.82rem;color:var(--muted);margin:4px 0 0}.search-all{display:flex;justify-content:space-between;padding-top:16px;font-size:.84rem;color:var(--accent-strong);font-weight:600}
-@media(max-width:760px){.desktop-nav{display:none}.nav-shell{height:60px}.menu-trigger{display:grid!important}.mobile-nav[hidden]{display:none}.mobile-nav:not([hidden]){display:block}.search-overlay{padding-top:10vh}}
-@media(prefers-reduced-transparency:reduce){.nav-shell,.mobile-nav,.search-panel{backdrop-filter:none;background:var(--surface)}}
-</style>
-<script is:inline>
-(()=>{
-const root=document.documentElement;
-const key='hear-me-out-theme';
-const themeMedia=matchMedia('(prefers-color-scheme: dark)');
-let savedTheme=null;
-try{savedTheme=localStorage.getItem(key)}catch{}
-if(savedTheme==='light'||savedTheme==='dark')root.dataset.theme=savedTheme;
-else root.dataset.theme=themeMedia.matches?'dark':'light';
-themeMedia.addEventListener('change',event=>{try{if(!localStorage.getItem(key))root.dataset.theme=event.matches?'dark':'light'}catch{root.dataset.theme=event.matches?'dark':'light'}});
-const dlg=document.querySelector('[data-search-dialog]'),input=document.querySelector('[data-search-input]'),results=document.querySelector('[data-search-results]');
-let lastFocus;
-function closeSearch(){dlg?.classList.remove('open');dlg?.setAttribute('aria-hidden','true');document.body.style.overflow='';lastFocus?.focus()}
-async function search(q){if(!q.trim()){results.innerHTML='<p class="search-hint">输入关键词，搜索全部文章。</p>';return}try{const pagefind=await import('/pagefind/pagefind.js');const found=await pagefind.search(q);const items=await Promise.all(found.results.slice(0,5).map((r)=>r.data()));results.innerHTML=items.length?items.map((x)=>`<article class="search-result"><a href="${x.url}">${x.meta.title||'未命名文章'}</a><p>${x.excerpt}</p></article>`).join(''):'<p class="search-hint">没有找到相关文章。</p>'}catch{results.innerHTML='<p class="search-hint">搜索索引尚未生成，请先完成正式构建。</p>'}}
-document.querySelectorAll('[data-search-open]').forEach(button=>button.addEventListener('click',()=>{lastFocus=document.activeElement;dlg.classList.add('open');dlg.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';setTimeout(()=>input.focus(),20)}));
-document.querySelectorAll('[data-search-close]').forEach(button=>button.addEventListener('click',closeSearch));
-input.addEventListener('input',()=>search(input.value));
-document.addEventListener('keydown',event=>{
-  if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();document.querySelector('[data-search-open]').click()}
-  if(event.key==='Escape'&&dlg.classList.contains('open'))closeSearch();
-  if(event.key==='Tab'&&dlg.classList.contains('open')){const focusable=[...dlg.querySelectorAll('button,input,a[href]')];const first=focusable[0],last=focusable[focusable.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}
-});
-document.querySelector('[data-theme-toggle]').addEventListener('click',()=>{const next=root.dataset.theme==='dark'?'light':'dark';root.dataset.theme=next;try{localStorage.setItem(key,next)}catch{}});
-const menu=document.querySelector('[data-menu-toggle]'),nav=document.querySelector('[data-mobile-nav]');
-menu.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));nav.hidden=!open});
 
-})();
+<dialog class="search-dialog" aria-labelledby="search-title" data-search-dialog>
+  <div class="search-top">
+    <h2 id="search-title">搜索文章</h2>
+    <button class="icon-button" aria-label="关闭搜索" data-search-close><X size={18} /></button>
+  </div>
+  <label class="search-field">
+    <Search size={18} />
+    <span class="sr-only">搜索关键词</span>
+    <input data-search-input type="search" placeholder="例如 TypeScript 或日常" autocomplete="off" autofocus />
+  </label>
+  <p class="search-status" data-search-status role="status">输入关键词搜索全部文章。</p>
+  <div class="quick-results" data-search-results></div>
+  <a class="text-link" href="/search">打开完整搜索页面</a>
+</dialog>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 30; padding-top: env(safe-area-inset-top); background: color-mix(in srgb, var(--bg) 94%, transparent); border-bottom: 1px solid var(--line); }
+  .nav-shell { min-height: var(--header-height); display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+  .brand { display: flex; align-items: center; gap: var(--space-8); min-height: var(--target); flex-shrink: 0; }
+  .brand span { font-weight: 600; line-height: 1.1; }
+  .brand small { display: block; color: var(--muted); font-size: .625rem; font-weight: 500; margin-top: var(--space-4); }
+  .desktop-nav, .nav-actions { display: flex; align-items: center; gap: var(--space-4); }
+  .desktop-nav a, .mobile-links a {
+    display: flex;
+    align-items: center;
+    min-height: var(--target);
+    padding-inline: var(--space-12);
+    border-radius: var(--radius-control);
+    color: var(--secondary);
+    font-size: var(--type-small);
+  }
+  .desktop-nav a, .mobile-links a { transition: color var(--duration) var(--ease), background-color var(--duration) var(--ease); }
+  nav a:hover { background: var(--surface-soft); }
+  nav [aria-current] { color: var(--accent-strong); background: var(--accent-wash); }
+  .menu-trigger, .mobile-nav { display: none; }
+  :global(.menu-trigger .close-icon), :global(.menu-trigger[aria-expanded="true"] .menu-icon),
+  :global(.theme-toggle .sun-icon), :global([data-theme="dark"] .theme-toggle .moon-icon) { display: none; }
+  :global(.menu-trigger[aria-expanded="true"] .close-icon), :global([data-theme="dark"] .theme-toggle .sun-icon) { display: block; }
+  @media (max-width: 767px) {
+    .desktop-nav { display: none; }
+    .menu-trigger { display: grid; }
+    .mobile-nav:not([hidden]) {
+      display: block;
+      position: absolute;
+      top: 100%;
+      inset-inline: 0;
+      background: var(--surface);
+      border-block: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .mobile-links { display: grid; gap: var(--space-4); padding-block: var(--space-12); }
+  }
+
+  .search-dialog {
+    position: fixed;
+    inset: clamp(1rem, 12vh, 8rem) 0 auto;
+    margin: 0 auto;
+    width: min(100% - 2 * var(--page-gutter), 36rem);
+    max-height: 80dvh;
+    overflow: auto;
+    background: var(--surface);
+    color: var(--text);
+    padding: var(--space-16);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow);
+  }
+  .search-dialog::backdrop { background: rgb(17 21 17 / 48%); }
+  .search-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-8); }
+  .search-top h2 { font-size: var(--type-subsection); }
+  .quick-results { display: grid; }
+  .quick-results :global(a) { min-height: var(--target); padding-block: var(--space-8); border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+  .quick-results :global(a:hover) { color: var(--accent-strong); background: var(--accent-wash); }
+  .quick-results :global(a) { padding-inline: var(--space-8); }
+  .quick-results :global(p) {
+    color: var(--secondary);
+    font-size: var(--type-meta);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+</style>
+
+<script define:vars={{ themeKey: theme.storageKey }}>
+  const root = document.documentElement;
+  const media = matchMedia('(prefers-color-scheme: dark)');
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  const updateTheme = (value) => {
+    root.dataset.theme = value;
+    document.querySelector('meta[name="theme-color"]').content = getComputedStyle(root).getPropertyValue('--bg').trim();
+    themeToggle.setAttribute('aria-pressed', String(value === 'dark'));
+  };
+  updateTheme(root.dataset.theme || (media.matches ? 'dark' : 'light'));
+  media.addEventListener('change', (event) => {
+    try { if (localStorage.getItem(themeKey)) return; } catch {}
+    updateTheme(event.matches ? 'dark' : 'light');
+  });
+  themeToggle.addEventListener('click', () => {
+    const value = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    updateTheme(value);
+    try { localStorage.setItem(themeKey, value); } catch {}
+  });
+</script>
+
+<script>
+  import { findArticles } from '@/lib/search-client';
+  import { createHighlighter, renderExcerpt } from '@/lib/search-highlight';
+  const menu = document.querySelector<HTMLButtonElement>('[data-menu-toggle]')!;
+  const nav = document.getElementById('mobile-nav')!;
+  const header = menu.closest('header')!;
+  const setMenu = (open: boolean) => {
+    nav.hidden = !open;
+    menu.setAttribute('aria-expanded', String(open));
+    menu.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+  };
+  menu.addEventListener('click', () => setMenu(nav.hidden));
+  document.addEventListener('click', (event) => { if (!header.contains(event.target as Node)) setMenu(false); });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !nav.hidden) { setMenu(false); menu.focus(); }
+  });
+  matchMedia('(min-width: 48rem)').addEventListener('change', () => setMenu(false));
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-search-dialog]')!;
+  const open = document.querySelector<HTMLButtonElement>('[data-search-open]')!;
+  const input = dialog.querySelector<HTMLInputElement>('[data-search-input]')!;
+  const status = dialog.querySelector('[data-search-status]')!;
+  const results = dialog.querySelector('[data-search-results]')!;
+  const showSearch = () => {
+    setMenu(false);
+    if (!dialog.open) dialog.showModal();
+  };
+  open.addEventListener('click', showSearch);
+  dialog.querySelector('[data-search-close]')!.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
+    if (event.target !== dialog) return;
+    const box = dialog.getBoundingClientRect();
+    if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) dialog.close();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && dialog.open) {
+      event.preventDefault();
+      dialog.close();
+      return;
+    }
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      showSearch();
+    }
+  });
+
+  let request = 0;
+  input.addEventListener('input', async () => {
+    const id = ++request;
+    const query = input.value.trim();
+    results.replaceChildren();
+    status.textContent = query ? '正在搜索…' : '输入关键词搜索全部文章。';
+    if (!query) return;
+    try {
+      const matches = await findArticles(query, 5);
+      if (id !== request) return;
+      status.textContent = matches.length ? '' : '没有找到相关文章。';
+      const highlight = createHighlighter(query);
+      for (const match of matches) {
+        const link = document.createElement('a');
+        link.href = match.url;
+        const title = document.createElement('strong');
+        title.append(highlight(match.meta.title || '未命名文章'));
+        const snippet = document.createElement('p');
+        snippet.append(renderExcerpt(match.excerpt, highlight));
+        link.append(title, snippet);
+        results.append(link);
+      }
+    } catch {
+      if (id === request) status.textContent = '搜索索引暂不可用，请使用构建后的预览。';
+    }
+  });
 </script>

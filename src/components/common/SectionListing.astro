@@ -1,0 +1,89 @@
+---
+import { Braces, Feather } from '@lucide/astro';
+import PostCard from '@/components/common/PostCard.astro';
+import { getPosts, tagsOf, type Section } from '@/lib/posts';
+
+const { section, title, description } = Astro.props as { section: Section; title: string; description: string };
+const posts = await getPosts(section);
+const tags = tagsOf(posts);
+const isLife = section === 'life';
+const href = `/${section}`;
+---
+<header class="container page-intro" class:list={{ 'tech-intro': !isLife }}>
+  <div class="section-icon" aria-hidden="true">{isLife ? <Feather size={24} /> : <Braces size={24} />}</div>
+  <h1>{title}</h1>
+  <p>{description}</p>
+  <p class="section-count">{posts.length} {isLife ? '篇随笔' : '篇技术文章'}</p>
+</header>
+
+<section class="container listing" data-section-listing data-paginate={isLife ? 'true' : 'false'}>
+  {tags.length > 0 && (
+    <nav class="filter-row" aria-label="按标签筛选">
+      <a href={href} data-filter="" aria-current="true">全部</a>
+      {tags.map((tag) => <a data-filter={tag} href={`${href}?tag=${encodeURIComponent(tag)}`}>{tag}</a>)}
+    </nav>
+  )}
+  <h2 class="sr-only">文章列表</h2>
+  <div class="post-list">
+    {posts.map((post) => (
+      <div data-post-tags={JSON.stringify(post.data.tags)}><PostCard post={post} showSection={false} /></div>
+    ))}
+  </div>
+  <p class="empty-state" data-empty hidden={posts.length > 0}>这里还没有符合条件的文章。</p>
+  {isLife && (
+    <nav class="pagination" aria-label="文章分页" data-pagination hidden>
+      <a data-prev class="text-link">← 更新的文章</a>
+      <span data-page-label></span>
+      <a data-next class="text-link">更早的文章 →</a>
+    </nav>
+  )}
+</section>
+
+<style>
+  .listing { padding-top: var(--space-20); }
+  .page-intro:not(.tech-intro) { background: var(--life-wash); }
+  .section-icon { color: var(--life-ink); margin-bottom: var(--space-12); }
+  .tech-intro .section-icon { color: var(--accent-strong); }
+  .post-list { display: grid; gap: var(--space-12); border: 0; }
+  .section-count { font-size: var(--type-meta); color: var(--muted); }
+  .tech-intro .section-count { color: var(--accent-strong); }
+  .pagination { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-12); margin-top: var(--space-16); font-size: var(--type-small); color: var(--muted); }
+</style>
+
+<script>
+  const listing = document.querySelector<HTMLElement>('[data-section-listing]');
+  if (listing) {
+    const url = new URL(location.href);
+    const tag = url.searchParams.get('tag') ?? '';
+    const posts = [...listing.querySelectorAll<HTMLElement>('[data-post-tags]')];
+    const filtered = posts.filter((post) => !tag || (JSON.parse(post.dataset.postTags ?? '[]') as string[]).includes(tag));
+    const pageSize = 8;
+    const paginate = listing.dataset.paginate === 'true';
+    const pageCount = paginate ? Math.max(1, Math.ceil(filtered.length / pageSize)) : 1;
+    const requested = Number(url.searchParams.get('page'));
+    const page = Number.isSafeInteger(requested) ? Math.min(pageCount, Math.max(1, requested)) : 1;
+    const visible = new Set(paginate ? filtered.slice((page - 1) * pageSize, page * pageSize) : filtered);
+    for (const post of posts) post.hidden = !visible.has(post);
+    for (const link of listing.querySelectorAll<HTMLElement>('[data-filter]')) {
+      if (link.dataset.filter === tag) link.setAttribute('aria-current', 'true');
+      else link.removeAttribute('aria-current');
+    }
+    listing.querySelector<HTMLElement>('[data-empty]')!.hidden = visible.size > 0;
+
+    if (pageCount > 1) {
+      const navigation = listing.querySelector<HTMLElement>('[data-pagination]')!;
+      const pageHref = (number: number) => {
+        url.searchParams.set('page', String(number));
+        return url.pathname + url.search;
+      };
+      const prev = navigation.querySelector<HTMLAnchorElement>('[data-prev]')!;
+      const next = navigation.querySelector<HTMLAnchorElement>('[data-next]')!;
+      prev.hidden = page <= 1;
+      next.hidden = page >= pageCount;
+      if (!prev.hidden) prev.href = pageHref(page - 1);
+      if (!next.hidden) next.href = pageHref(page + 1);
+      navigation.querySelector('[data-page-label]')!.textContent = `第 ${page} / ${pageCount} 页`;
+      navigation.hidden = false;
+    }
+  }
+</script>
