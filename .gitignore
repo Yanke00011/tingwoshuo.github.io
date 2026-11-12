@@ -1,8 +1,28 @@
 node_modules/
 dist/
 .astro/
+.wrangler/
+wrangler.staging.jsonc
 .env*
+.dev.vars*
 .DS_Store
+*.tsbuildinfo
+*.sqlite
+*.sqlite3
+*.db
+*.age
+*.sql.age
+*.tar.gz.age
+*.pem
+*.key
+.age/
+.aws/
+/backups/
+/exports/
+/r2-objects/
+/d1-export*.sql
+/r2-inventory*.json
+/r2-head*.jsonl
 
 # Private local writing studio drafts and build output
 .editor-drafts/

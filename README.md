@@ -1,14 +1,14 @@
 # 听我说 · Hear Me Out
 
-一个以静态生成优先的中文个人博客。日常随笔和技术文章分别维护在 Markdown 内容集合中；布局、配置、主题和内容彼此分离，添加文章不需要改页面代码。
+一个以中文阅读体验为核心的个人博客。文章与视觉组件分离；当前生产站仍由 Markdown 文件静态生成。V7 本地实现将 Astro 改为 Cloudflare Workers SSR，并从 D1 只读取已发布版本；在单独批准生产切换之前，线上数据和发布流程仍以当前 Cloudflare Pages + GitHub Markdown 为准。
 
 ## 技术栈
 
 - Astro 5 + TypeScript strict + Astro Content Collections（Zod Schema）
 - Tailwind CSS 4（Vite 插件）与 CSS Variables Design Tokens
 - Markdown / MDX、Expressive Code（Shiki）、行号插件、Lucide Astro
-- Pagefind 中文静态全文搜索、RSS、Sitemap
-- pnpm；静态输出目录 `dist/`，可部署到 Cloudflare Pages
+- V7 本地实现：Cloudflare Workers SSR、D1 发布内容查询、R2 受控媒体、RSS、Sitemap 与 D1 全文搜索
+- 生产当前：pnpm 静态输出目录 `dist/`，部署到 Cloudflare Pages；V7 部署与资源绑定尚未配置
 - 本地专用创作台：Tiptap + Markdown/MDX AST 检查 + Express loopback API
 
 当前仓库使用 Astro 5.18.2。推荐使用 Node 22.23.4 或更新的 Node 22 LTS 版本，以满足当前开发工具链的运行要求。
@@ -20,25 +20,18 @@ pnpm install
 pnpm dev
 ```
 
-本地开发地址通常是 `http://localhost:4321`。开发模式没有 Pagefind 索引，正式搜索请运行：
+本地开发地址通常是 `http://localhost:4321`。V7 动态路由读取隔离的本地 D1；应用 schema 和迁移样例后即可查看：
 
 ```sh
 pnpm build
 pnpm preview
 ```
 
-`pnpm build` 会先生成静态站点，再通过 Pagefind 生成 `dist/pagefind/` 中文索引。
+`pnpm build` 生成 Cloudflare Worker bundle。`wrangler.local.jsonc` 中的 D1、R2、KV 都是本地测试绑定；不要替换成生产凭据做本地验证。
 
-## Cloudflare Pages 部署
+## 当前生产部署与 V7 迁移状态
 
-1. 将仓库推送到 GitHub/GitLab 等 Git 提供商。
-2. 在 Cloudflare Pages 创建项目并连接仓库。
-3. 构建命令填写 `pnpm build`，输出目录填写 `dist`。
-4. 使用 Node 22.23.4 或更新的 Node 22 版本，并启用 Corepack/pnpm。
-5. 部署后在 Pages 的 Custom domains 里添加域名，并按 Cloudflare 提示设置 DNS。
-6. 打开 `src/config/site.ts`，将 `url` 改成带 `https://` 的正式域名。该配置同时用于 Canonical、Open Graph、RSS 和 robots.txt。
-
-本项目为纯静态 SSG，不需要数据库、Workers 或运行时环境变量。
+线上目前仍使用 Cloudflare Pages 与 GitHub Markdown。V7 引入 Cloudflare Workers SSR，但缺少完整 D1/R2 生产备份、隔离 Cloudflare E2E、生产 bindings 与授权切换，因此本地 `pnpm build` 成功不代表可直接部署。保持现有 Pages；不要在备份、迁移、预览和恢复验收前切换。
 
 ## 修改网站信息
 
@@ -48,7 +41,7 @@ pnpm preview
 
 ## 添加、修改、隐藏和删除文章
 
-文章放在 `src/content/life/` 或 `src/content/tech/`，支持 `.md` 与 `.mdx`。
+当前生产文章位于 `src/content/life/` 或 `src/content/tech/`，支持 `.md` 与 `.mdx`；V7 Studio 本地 D1 模式为迁移目标，公开 Astro 路由只允许读取已发布版本。迁移完成并明确切换前，不要删 GitHub 源文件。Studio 生产当前仍使用 GitHub backend。
 
 可以交互创建草稿：
 
@@ -86,11 +79,11 @@ featured: false
 
 首页、列表、文章、归档、关于、搜索和 404 页面分别位于 `src/pages/`。内容集合 Schema 在 `src/content.config.ts`。添加新栏目时，需要创建新集合、扩展 `Section`/查询方法和文章路径，然后补列表页与文章页。请先看当前 `life`/`tech` 的实现，保持草稿过滤规则一致。
 
-关于页的个人介绍与项目说明位于 `src/pages/about.astro`。搜索弹窗支持 `⌘/Ctrl + K`，正式全文搜索依赖构建后生成的 Pagefind 索引。
+关于页的个人介绍与项目说明位于 `src/pages/about.astro`。搜索弹窗支持 `⌘/Ctrl + K`；V7 本地分支搜索 D1，生产 Pages 在切换前仍运行旧版本搜索。
 
 ## 常见问题
 
-- **为什么开发时搜索提示没有索引？** Pagefind 仅在完整静态构建后运行；执行 `pnpm build`，再通过 `pnpm preview` 查看。
+- **为什么动态开发时搜索没有内容？** 检查隔离本地 D1 schema 和历史文章导入；不要用生产凭据替代本地绑定。
 - **文章没有出现在列表？** 检查是否设成 `draft: true`，并确认文件在正确集合目录、Frontmatter 格式通过 Schema。
 - **Canonical/分享链接域名不对？** 更新 `src/config/site.ts` 的 `url` 后重新构建。
 - **pnpm 找不到？** 运行 `corepack enable` 后再执行 `pnpm install`。

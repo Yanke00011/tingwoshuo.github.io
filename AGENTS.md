@@ -14,11 +14,11 @@ Then check `git status`, branch, `HEAD`, and `origin/main` in both this reposito
 
 ## Architecture and working rules
 
-- Astro 5 static generation with TypeScript, Astro Content Collections/Zod, Tailwind CSS 4, Markdown/MDX, Pagefind, RSS, and sitemap. The production build command is `pnpm build`; validation is `pnpm check`.
+- Astro 5 + TypeScript + Tailwind CSS 4 + Markdown/MDX. The V7 working tree uses Cloudflare Workers SSR with D1-backed published-only routes, RSS, sitemap, search and R2 media; production remains on the old Cloudflare Pages/GitHub Markdown path until a separately authorized cutover. The build command is `pnpm build`; validation is `pnpm check`.
 - Content lives under `src/content/life/` and `src/content/tech/`. Keep frontmatter valid against `src/content.config.ts`; `title`, non-empty `description`, and `pubDate` are required. Stable filenames are public URL slugs.
 - Pages, layouts, components, content queries, site settings, theme tokens, and content styles live in their existing `src/` areas. Follow current patterns and the design system instead of replacing the architecture.
 - `tools/editor/` is a local loopback-only editor. The Cloudflare-hosted Studio is a separate sibling project. Do not conflate their routes, storage, or deployment.
-- Studio publishes directly to the configured `main` branch and triggers Cloudflare Pages. Article deletion from Studio is also a branch commit. Never push, deploy, edit Cloudflare resources, or perform live destructive operations unless the user explicitly requests it.
+- Studio production currently publishes directly to the configured `main` branch and triggers Cloudflare Pages. The V7 D1 backend exists only in local/test configuration. Never push, deploy, edit Cloudflare resources, or perform live destructive operations unless the user explicitly requests it.
 - Do not create branches; the user wants changes on the existing main checkout. Do not alter Studio/blog integration contracts or the two-repository arrangement without discussing the architecture change first.
 - Preserve article wording and metadata outside the user's requested scope. Do not fabricate content or mark drafts public without explicit intent.
 - Use Node `>=22.23.4` as declared in `package.json`. After content/schema changes, run `pnpm check` and `pnpm build` when verification is requested or needed; record actual outcomes in the canonical `../tingwoshuo-Studio/PROGRESS.md`.
