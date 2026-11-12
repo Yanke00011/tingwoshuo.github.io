@@ -3,13 +3,15 @@ import remarkSemanticTone, { remarkSemanticToneMdx } from './src/lib/remark-sema
 import expressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import mdx from '@astrojs/mdx';
-import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import cloudflare from '@astrojs/cloudflare';
 import { site } from './src/config/site';
 
 export default defineConfig({
   site: site.url,
-  integrations: [expressiveCode({ themes: ['github-dark'], plugins: [pluginLineNumbers()] }), mdx({ remarkPlugins: [remarkSemanticToneMdx] }), sitemap()],
+  output: 'server',
+  adapter: cloudflare({ imageService: 'passthrough', platformProxy: { configPath: './wrangler.local.jsonc' } }),
+  integrations: [expressiveCode({ themes: ['github-dark'], plugins: [pluginLineNumbers()] }), mdx({ remarkPlugins: [remarkSemanticToneMdx] })],
   markdown: { remarkPlugins: [remarkSemanticTone] },
   vite: { plugins: [tailwindcss()] },
 });

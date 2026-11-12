@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'; import { getPosts, dateLabel, postPath } from '@/lib/posts'; import { ArrowUpRight } from '@lucide/astro';
-const posts=await getPosts();
+const posts=await getPosts(Astro.locals);
 const groups=new Map<number,Map<number,typeof posts>>();
 for(const post of posts){const year=post.data.pubDate.getFullYear();const month=post.data.pubDate.getMonth()+1;const months=groups.get(year)||new Map<number,typeof posts>();months.set(month,[...(months.get(month)||[]),post]);groups.set(year,months)}
 const years=[...groups.keys()].sort((a,b)=>b-a);

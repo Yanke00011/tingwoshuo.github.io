@@ -4,7 +4,7 @@ import PostCard from '@/components/common/PostCard.astro';
 import { getPosts, tagsOf, type Section } from '@/lib/posts';
 
 const { section, title, description } = Astro.props as { section: Section; title: string; description: string };
-const posts = await getPosts(section);
+const posts = await getPosts(Astro.locals, section);
 const tags = tagsOf(posts);
 const isLife = section === 'life';
 const href = `/${section}`;

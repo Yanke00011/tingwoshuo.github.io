@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tingwoshuo-blog-v7-local",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2026-11-10",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tingwoshuo-studio-migration-test-v7",
+      "database_id": "00000000-0000-0000-0000-000000000008",
+      "migrations_dir": "../tingwoshuo-Studio/migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PRIVATE_MEDIA",
+      "bucket_name": "tingwoshuo-v7-media-test"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+      "id": "00000000000000000000000000000008"
+    }
+  ]
+}

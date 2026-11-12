@@ -1,21 +1,10 @@
-interface SearchArticle {
-  url: string;
-  meta: { title?: string; section?: string };
-  excerpt: string;
-}
-interface Pagefind {
-  search(query: string): Promise<{ results: Array<{ data(): Promise<SearchArticle> }> }>;
-}
-
-const indexPath = '/pagefind/pagefind.js';
-let index: Promise<Pagefind> | undefined;
-
 export async function findArticles(query: string, limit?: number) {
-  index ??= import(/* @vite-ignore */ indexPath).catch((error) => {
-    index = undefined;
-    throw error;
-  });
-  const pagefind = await index;
-  const { results } = await pagefind.search(query);
-  return Promise.all(results.slice(0, limit).map((result) => result.data()));
+  const response = await fetch(`/api/search.json?q=${encodeURIComponent(query)}`);
+  if (!response.ok) throw new Error(`Search API returned ${response.status}`);
+  const data = await response.json() as { articles: Array<{ section: string; slug: string; title: string; description: string; excerpt: string }> };
+  return data.articles.slice(0, limit).map((article) => ({
+    url: `/${article.section}/${encodeURIComponent(article.slug)}`,
+    meta: { title: article.title, section: article.section === 'life' ? '闲聊' : '技术' },
+    excerpt: article.excerpt || article.description,
+  }));
 }

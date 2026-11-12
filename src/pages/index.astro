@@ -4,7 +4,7 @@ import PostCard from '@/components/common/PostCard.astro';
 import { getPosts } from '@/lib/posts';
 import { ArrowDown, ArrowUpRight, AudioLines, Braces, Feather } from '@lucide/astro';
 
-const posts = await getPosts();
+const posts = await getPosts(Astro.locals);
 const featured = posts.find((post) => post.data.featured);
 const latest = posts.filter((post) => !post.data.featured).slice(0, 4);
 ---

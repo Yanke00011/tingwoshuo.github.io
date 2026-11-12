@@ -1,16 +1,17 @@
 ---
-import { render } from 'astro:content';
 import { ArrowLeft, ArrowRight } from '@lucide/astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import CoverMedia from '@/components/common/CoverMedia.astro';
 import RelatedPosts from '@/components/article/RelatedPosts.astro';
 import { dateLabel, getPosts, postPath, readingMinutes, type Post } from '@/lib/posts';
+import { renderArticle } from '@/lib/render-content';
 import { site } from '@/config/site';
+import { publicSiteBase } from '@/lib/site-url';
 import '@/styles/article.css';
 
 const { post } = Astro.props as { post: Post };
-const { Content, headings } = await render(post);
-const posts = await getPosts(post.collection);
+const { html, headings } = await renderArticle(post.body);
+const posts = await getPosts(Astro.locals, post.collection);
 const index = posts.findIndex((entry) => entry.id === post.id);
 const previous = posts[index + 1];
 const next = posts[index - 1];
@@ -23,11 +24,11 @@ const structured = {
   description: post.data.description,
   datePublished: post.data.pubDate.toISOString(),
   dateModified: (post.data.updatedDate || post.data.pubDate).toISOString(),
-  mainEntityOfPage: new URL(postPath(post), site.url).toString(),
+  mainEntityOfPage: new URL(postPath(post), publicSiteBase(Astro.url, Astro.locals)).toString(),
   author: { '@type': 'Person', name: site.author },
 };
 ---
-<BaseLayout title={post.data.title} description={post.data.description} image={post.data.cover || '/og.png'}>
+<BaseLayout title={post.data.title} description={post.data.description} image={post.data.cover || '/og.png'} ogType="article">
   <script type="application/ld+json" set:html={JSON.stringify(structured).replace(/</g, '\\u003c')} />
   <div class="container article-page">
     <a href={`/${post.collection}`} class="text-link article-back"><ArrowLeft size={16} /> {sectionTitle}</a>
@@ -64,7 +65,7 @@ const structured = {
             </nav>
           </details>
         )}
-        <div class="prose"><Content /></div>
+        <div class="prose" set:html={html} />
       </div>
     </article>
     <nav class="post-nav" aria-label="文章导航">

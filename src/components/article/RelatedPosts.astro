@@ -3,7 +3,7 @@ import PostCard from '@/components/common/PostCard.astro';
 import type { Post } from '@/lib/posts';
 import { getPosts } from '@/lib/posts';
 const { current } = Astro.props as { current: Post };
-const posts = await getPosts();
+const posts = await getPosts(Astro.locals);
 const related = posts.filter((post) => post.id !== current.id || post.collection !== current.collection)
   .map((post) => ({ post, score: post.data.tags.filter((tag) => current.data.tags.includes(tag)).length + (post.collection === current.collection ? 1 : 0) }))
   .filter((item) => item.score > 0).sort((a, b) => b.score - a.score).slice(0, 2).map((item) => item.post);
