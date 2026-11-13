@@ -1,14 +1,14 @@
 # 听我说 · Hear Me Out
 
-一个以中文阅读体验为核心的个人博客。文章与视觉组件分离；当前生产站仍由 Markdown 文件静态生成。V7 本地实现将 Astro 改为 Cloudflare Workers SSR，并从 D1 只读取已发布版本；在单独批准生产切换之前，线上数据和发布流程仍以当前 Cloudflare Pages + GitHub Markdown 为准。
+一个以中文阅读体验为核心的个人博客。页面使用 Astro SSR 部署到现有 Cloudflare Pages 项目；V7 正式运行时从 D1 只读取已发布版本，媒体通过 R2 受控读取。Markdown/MDX 原创源文件继续保存在 GitHub，用于版本管理和迁移核对。
 
 ## 技术栈
 
 - Astro 5 + TypeScript strict + Astro Content Collections（Zod Schema）
 - Tailwind CSS 4（Vite 插件）与 CSS Variables Design Tokens
 - Markdown / MDX、Expressive Code（Shiki）、行号插件、Lucide Astro
-- V7 本地实现：Cloudflare Workers SSR、D1 发布内容查询、R2 受控媒体、RSS、Sitemap 与 D1 全文搜索
-- 生产当前：pnpm 静态输出目录 `dist/`，部署到 Cloudflare Pages；V7 部署与资源绑定尚未配置
+- V7 生产运行时：Astro SSR + Cloudflare Pages Functions、D1 发布内容查询、R2 受控媒体、RSS、Sitemap 与 D1 全文搜索
+- 生产配置：`wrangler.jsonc` 中绑定 V7 production D1/R2/KV；Preview 环境使用独立 Staging 绑定。生产 Pages 自动部署暂时关闭，通过 Wrangler 受控部署
 - 本地专用创作台：Tiptap + Markdown/MDX AST 检查 + Express loopback API
 
 当前仓库使用 Astro 5.18.2。推荐使用 Node 22.23.4 或更新的 Node 22 LTS 版本，以满足当前开发工具链的运行要求。
@@ -29,9 +29,9 @@ pnpm preview
 
 `pnpm build` 生成 Cloudflare Worker bundle。`wrangler.local.jsonc` 中的 D1、R2、KV 都是本地测试绑定；不要替换成生产凭据做本地验证。
 
-## 当前生产部署与 V7 迁移状态
+## 当前生产部署与 V7 状态
 
-线上目前仍使用 Cloudflare Pages 与 GitHub Markdown。V7 引入 Cloudflare Workers SSR，但缺少完整 D1/R2 生产备份、隔离 Cloudflare E2E、生产 bindings 与授权切换，因此本地 `pnpm build` 成功不代表可直接部署。保持现有 Pages；不要在备份、迁移、预览和恢复验收前切换。
+现有 Pages 项目 `tingwoshuo` 保留原 `pages.dev` 地址，当前部署 Astro SSR 并读取独立 V7 production D1。`Studio` V7 Worker 由 Cloudflare Access 保护，内容写入 D1，媒体写入私有 R2。旧 Cloudflare 资源和 Studio 旧 GitHub 发布代码尚未清理；两仓变更也尚未全部推送。详见 Studio 仓库的唯一进度文件 `../tingwoshuo-Studio/PROGRESS.md`。
 
 ## 修改网站信息
 
@@ -41,7 +41,7 @@ pnpm preview
 
 ## 添加、修改、隐藏和删除文章
 
-当前生产文章位于 `src/content/life/` 或 `src/content/tech/`，支持 `.md` 与 `.mdx`；V7 Studio 本地 D1 模式为迁移目标，公开 Astro 路由只允许读取已发布版本。迁移完成并明确切换前，不要删 GitHub 源文件。Studio 生产当前仍使用 GitHub backend。
+原创文章源文件位于 `src/content/life/` 或 `src/content/tech/`，支持 `.md` 与 `.mdx`；新 V7 Studio 生产实例以 D1 为内容发布源，公开 Astro 路由只读取已发布版本。GitHub 中的 Markdown/MDX 源文件仍需保留，作为原创内容源和可审计的版本记录。
 
 可以交互创建草稿：
 
@@ -79,7 +79,7 @@ featured: false
 
 首页、列表、文章、归档、关于、搜索和 404 页面分别位于 `src/pages/`。内容集合 Schema 在 `src/content.config.ts`。添加新栏目时，需要创建新集合、扩展 `Section`/查询方法和文章路径，然后补列表页与文章页。请先看当前 `life`/`tech` 的实现，保持草稿过滤规则一致。
 
-关于页的个人介绍与项目说明位于 `src/pages/about.astro`。搜索弹窗支持 `⌘/Ctrl + K`；V7 本地分支搜索 D1，生产 Pages 在切换前仍运行旧版本搜索。
+关于页的个人介绍与项目说明位于 `src/pages/about.astro`。搜索弹窗支持 `⌘/Ctrl + K`；生产搜索读取 D1 发布内容。
 
 ## 常见问题
 

@@ -1,0 +1,54 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "tingwoshuo",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-11-10",
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "tingwoshuo-v7-production",
+      "database_id": "2c5847a9-44b0-4828-96d1-ece341360186"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PRIVATE_MEDIA",
+      "bucket_name": "tingwoshuo-v7-production-media"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+      "id": "825f594d7bf344d68c3e34bfe795b592"
+    }
+  ],
+  "env": {
+    "preview": {
+      "vars": {
+        "ENVIRONMENT": "staging"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "tingwoshuo-studio-v7-staging",
+          "database_id": "fc9631f7-1a1b-4e26-bc0d-581417779b1a"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "PRIVATE_MEDIA",
+          "bucket_name": "tingwoshuo-v7-staging-media"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "SESSION",
+          "id": "4c2c05addb004898a36e1723f388e116"
+        }
+      ]
+    }
+  }
+}
